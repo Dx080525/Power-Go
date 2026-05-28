@@ -1,0 +1,725 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>萌宠抽卡乐园 - 钛金高级版</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Segoe UI", sans-serif;
+            background: url('https://img-baofeng.cdn.bcebos.com/bfeimg/jpg/992bcda7f81498877bcbb6a56e545465.jpg') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            color: #f0f4f8;
+            padding: 20px;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(10, 16, 32, 0.65);
+            z-index: -1;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 36px;
+            letter-spacing: 2px;
+            color: #00f2fe;
+            text-shadow: 0 0 15px rgba(0, 242, 254, 0.6);
+            font-weight: 800;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .panel {
+            background: rgba(22, 32, 54, 0.6);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 24px;
+            padding: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 15px 35px rgba(0,0,0,.4), inset 0 0 15px rgba(255,255,255,0.05);
+        }
+
+        .panel h2, .bag-title {
+            color: #ffffff;
+            font-size: 22px;
+            margin-bottom: 15px;
+            border-left: 4px solid #00c6fb;
+            padding-left: 8px;
+        }
+
+        .top-bar {
+            margin-bottom: 20px;
+            max-width: 1300px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .gold-box {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 165, 0, 0.05));
+            backdrop-filter: blur(10px);
+            padding: 18px;
+            border-radius: 20px;
+            font-size: 26px;
+            font-weight: bold;
+            text-align: center;
+            color: #ffd700;
+            border: 2px solid rgba(255, 215, 0, 0.4);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.15);
+        }
+
+        .gacha-buttons {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        button {
+            border: none;
+            cursor: pointer;
+            transition: .2s;
+            font-weight: bold;
+        }
+
+        .gacha-btn {
+            flex: 1;
+            min-width: 180px;
+            padding: 18px;
+            border-radius: 18px;
+            font-size: 20px;
+            color: white;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .single {
+            background: linear-gradient(135deg, #00c6fb, #005bea);
+            box-shadow: 0 5px 15px rgba(0, 198, 251, 0.3);
+        }
+
+        .ten {
+            background: linear-gradient(135deg, #ff9966, #ff5e62);
+            box-shadow: 0 5px 15px rgba(255, 94, 98, 0.3);
+        }
+
+        .gacha-btn:hover {
+            transform: translateY(-3px) scale(1.01);
+            filter: brightness(1.1);
+        }
+
+        .rate-board {
+            background: rgba(10, 15, 28, 0.5);
+            border-radius: 18px;
+            padding: 15px;
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            line-height: 2;
+            font-size: 16px;
+            color: #cbd5e1;
+        }
+
+        .rate-board h3 {
+            color: #00f2fe;
+        }
+
+        .result-title {
+            margin-top: 20px;
+            margin-bottom: 15px;
+            font-size: 22px;
+            color: #94a3b8;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+        }
+
+        .card {
+            border-radius: 20px;
+            padding: 15px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            min-height: 200px;
+            color: white;
+            animation: flip .6s ease;
+            box-shadow: 0 8px 20px rgba(0,0,0,.4);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .monster-img {
+            width: 90px;
+            height: 90px;
+            object-fit: contain;
+            margin-top: 5px;
+            filter: drop-shadow(0 5px 8px rgba(0,0,0,0.5));
+        }
+
+        .card .name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+
+        .card .rarity {
+            margin-top: 4px;
+            font-size: 13px;
+            background: rgba(0,0,0,0.2);
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .card .price {
+            margin-top: 6px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .N {
+            background: linear-gradient(135deg, rgba(100, 116, 139, 0.7), rgba(71, 85, 105, 0.8));
+            border: 2px solid #94a3b8;
+        }
+
+        .R {
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.6), rgba(14, 165, 233, 0.7));
+            border: 2px solid #38bdf8;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+        }
+
+        .SR {
+            background: linear-gradient(135deg, rgba(192, 132, 252, 0.6), rgba(147, 51, 234, 0.7));
+            border: 2px solid #c084fc;
+            box-shadow: 0 0 15px rgba(192, 132, 252, 0.2);
+        }
+
+        .SSR {
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.6), rgba(217, 119, 6, 0.7));
+            border: 2px solid #fbbf24;
+            animation: ssrGlow 1.2s infinite alternate;
+        }
+
+        @keyframes ssrGlow {
+            from { box-shadow: 0 0 10px #fbbf24, inset 0 0 5px #fbbf24; }
+            to { box-shadow: 0 0 25px #fbbf24, inset 0 0 15px #fbbf24; }
+        }
+
+        @keyframes flip {
+            from { opacity: 0; transform: scale(.8) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .inventory {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .bag-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            border-radius: 14px;
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .bag-item-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .bag-item-img {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+        }
+
+        .sell-btn {
+            background: transparent;
+            border: 1px solid #ff6b81;
+            color: #ff6b81;
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .sell-btn:hover {
+            background: #ff6b81;
+            color: white;
+            box-shadow: 0 0 10px rgba(255,107,129,0.5);
+        }
+
+        .sell-all {
+            width: 100%;
+            margin-top: 15px;
+            background: linear-gradient(135deg,#ff758c,#ff7eb3);
+            color: white;
+            padding: 14px;
+            border-radius: 16px;
+            font-size: 18px;
+            box-shadow: 0 4px 15px rgba(255,117,140,0.4);
+        }
+
+        .sell-all:hover {
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+        }
+
+        .empty {
+            text-align: center;
+            color: #64748b;
+            padding: 20px 0;
+        }
+
+        /* ⚙️ 密码管理后台专属样式 */
+        .admin-trigger-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            color: #00f2fe;
+            padding: 10px 16px;
+            border-radius: 30px;
+            font-size: 14px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            backdrop-filter: blur(5px);
+            z-index: 999;
+        }
+        .admin-trigger-btn:hover {
+            background: #00f2fe;
+            color: #0f172a;
+            box-shadow: 0 0 15px #00f2fe;
+        }
+
+        .admin-panel-mask {
+            display: none;
+            position: fixed;
+            top:0; left:0; right:0; bottom:0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .admin-box {
+            background: #1e293b;
+            border: 2px solid #00f2fe;
+            border-radius: 20px;
+            padding: 25px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            color: #f8fafc;
+        }
+
+        .admin-box h3 {
+            margin-bottom: 15px;
+            color: #00f2fe;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 8px;
+        }
+
+        .admin-form-group {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .admin-form-group label {
+            font-size: 14px;
+            color: #94a3b8;
+        }
+
+        .admin-form-group input {
+            background: #0f172a;
+            border: 1px solid #475569;
+            color: #fff;
+            padding: 6px 10px;
+            border-radius: 8px;
+            width: 140px;
+            text-align: center;
+        }
+        .admin-form-group input:focus {
+            border-color: #00f2fe;
+            outline: none;
+        }
+
+        .admin-btn-group {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .admin-btn {
+            flex: 1;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+        .admin-save { background: #00f2fe; color: #0f172a; }
+        .admin-close { background: #475569; color: #fff; }
+
+        @media(max-width:900px){
+            .container { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>🌟 Power Go 🌟</h1>
+
+<div class="top-bar">
+    <div class="gold-box">
+        💰 总金币资产：<span id="gold">5000</span>
+    </div>
+</div>
+
+<div class="container">
+    <div class="panel">
+        <h2>🎴 钛金抽卡控制大厅</h2>
+
+        <div class="gacha-buttons">
+            <button class="gacha-btn single" onclick="drawCard(1)">
+                单抽（100金币）
+            </button>
+            <button class="gacha-btn ten" onclick="drawCard(10)">
+                十连抽（1000金币）
+            </button>
+        </div>
+
+        <div class="rate-board">
+            <h3>📢 概率公示</h3>
+            <div>N 普通：86%（出售 <span id="label-N">10</span> 金币）</div>
+            <div>R 稀有：10%（出售 <span id="label-R">80</span> 金币）</div>
+            <div>SR 超稀有：2.5%（出售 <span id="label-SR">800</span> 金币）</div>
+            <div style="color:#fbbf24; font-weight: bold;">SSR 传说：1.5%（出售 <span id="label-SSR">3500</span> 金币）</div>
+        </div>
+
+        <div class="result-title">
+            ✨ 抽卡结果
+        </div>
+        <div id="resultArea" class="card-grid"></div>
+    </div>
+
+    <div class="panel">
+        <div class="bag-title">🎒 精灵核心背包</div>
+        <div id="inventory" class="inventory">
+            <div class="empty">暂无精灵</div>
+        </div>
+        <button class="sell-all" onclick="sellAll()">
+            一键出售全部
+        </button>
+    </div>
+</div>
+
+<button class="admin-trigger-btn" onclick="openAdmin()">⚙️ 后台管理</button>
+
+<div id="adminModal" class="admin-panel-mask">
+    <div class="admin-box">
+        <h3>🛠️ 核心数据修改面板</h3>
+        
+        <div class="admin-form-group">
+            <label>修改当前总金币：</label>
+            <input type="number" id="input-gold" />
+        </div>
+        
+        <div class="admin-form-group">
+            <label>N级（普通）售价：</label>
+            <input type="number" id="input-price-N" />
+        </div>
+
+        <div class="admin-form-group">
+            <label>R级（稀有）售价：</label>
+            <input type="number" id="input-price-R" />
+        </div>
+
+        <div class="admin-form-group">
+            <label>SR级（超稀有）售价：</label>
+            <input type="number" id="input-price-SR" />
+        </div>
+
+        <div class="admin-form-group">
+            <label>SSR级（传说）售价：</label>
+            <input type="number" id="input-price-SSR" />
+        </div>
+
+        <div class="admin-btn-group">
+            <button class="admin-btn admin-save" onclick="saveAdminData()">保存修改</button>
+            <button class="admin-btn admin-close" onclick="closeAdmin()">关闭</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ⚙️【这里是后台管理员进入密码】：
+    const ADMIN_PASSWORD = "123456";
+
+    // 1. 初始化数据加载（加入 LocalStorage 持久化，防止刷新丢失）
+    let gold = localStorage.getItem("pg_gold") !== null ? parseInt(localStorage.getItem("pg_gold")) : 5000;
+    
+    // 如果本地有存过回收价，则使用本地的，否则使用初始价格
+    let prices = localStorage.getItem("pg_prices") !== null ? JSON.parse(localStorage.getItem("pg_prices")) : {
+        "N": 10,
+        "R": 80,
+        "SR": 800,
+        "SSR": 3500
+    };
+
+    // 如果本地有存过的背包，则加载
+    let inventory = localStorage.getItem("pg_inventory") !== null ? JSON.parse(localStorage.getItem("pg_inventory")) : [];
+
+    const monsters = [
+        { name: "妙蛙种子", rarity: "N", image: "https://asia.pokemon-card.com/hk/card-img/hk00008867.png" },
+        { name: "比比鸟", rarity: "N", image: "https://asia.pokemon-card.com/hk/card-img/hk00003243.png" },
+        { name: "大针蜂", rarity: "R", image: "https://asia.pokemon-card.com/tw/card-img/tw00018423.png" },
+        { name: "喷火龙", rarity: "SR", image: "https://q7.itc.cn/images01/20241028/5ebb6de3597743ef9dda4adb8a27406b.png" },
+        { name: "皮卡丘", rarity: "SSR", image: "https://asia.pokemon-card.com/tw/card-img/tw00018367.png" }
+    ];
+
+    // 保存金币、价格和背包到本地
+    function saveDataToStorage() {
+        localStorage.setItem("pg_gold", gold);
+        localStorage.setItem("pg_prices", JSON.stringify(prices));
+        localStorage.setItem("pg_inventory", JSON.stringify(inventory));
+    }
+
+    function updateGold() {
+        document.getElementById("gold").innerText = gold;
+    }
+
+    // 动态刷新前台的概率公示价格
+    function updatePriceLabels() {
+        document.getElementById("label-N").innerText = prices["N"];
+        document.getElementById("label-R").innerText = prices["R"];
+        document.getElementById("label-SR").innerText = prices["SR"];
+        document.getElementById("label-SSR").innerText = prices["SSR"];
+    }
+
+    function getRandomMonster() {
+        const rand = Math.random() * 100;
+        let rarity;
+
+        if (rand < 86) {
+            rarity = "N";
+        } else if (rand < 96) {
+            rarity = "R";
+        } else if (rand < 98.8) {
+            rarity = "SR";
+        } else {
+            rarity = "SSR";
+        }
+
+        const pool = monsters.filter(m => m.rarity === rarity);
+        const selected = pool[Math.floor(Math.random() * pool.length)];
+        
+        // 动态附带当前的最新回收价
+        return {
+            name: selected.name,
+            rarity: selected.rarity,
+            image: selected.image,
+            sell: prices[selected.rarity]
+        };
+    }
+
+    function drawCard(count) {
+        const cost = count === 1 ? 100 : 1000;
+
+        if (gold < cost) {
+            alert("金币不足");
+            return;
+        }
+
+        gold -= cost;
+        updateGold();
+        saveDataToStorage();
+
+        const resultArea = document.getElementById("resultArea");
+        resultArea.innerHTML = "";
+
+        for (let i = 0; i < count; i++) {
+            const loading = document.createElement("div");
+            loading.className = "card N";
+            loading.style.background = "rgba(0,0,0,0.4)";
+            loading.innerHTML = `
+                <div style="font-size:35px; color:#00f2fe;">⚡</div>
+                <div class="name" style="color:#00f2fe;">解析中...</div>
+                <div></div>
+            `;
+            resultArea.appendChild(loading);
+        }
+
+        setTimeout(() => {
+            resultArea.innerHTML = "";
+
+            for (let i = 0; i < count; i++) {
+                const monster = getRandomMonster();
+                inventory.push(monster);
+
+                const card = document.createElement("div");
+                card.className = `card ${monster.rarity}`;
+
+                card.innerHTML = `
+                    <img class="monster-img" src="${monster.image}">
+                    <div class="name">${monster.name}</div>
+                    <div class="rarity">${monster.rarity}</div>
+                    <div class="price">价值：${monster.sell} 金币</div>
+                `;
+                resultArea.appendChild(card);
+            }
+
+            renderInventory();
+            saveDataToStorage();
+        }, 600);
+    }
+
+    function renderInventory() {
+        const inventoryDiv = document.getElementById("inventory");
+
+        if (inventory.length === 0) {
+            inventoryDiv.innerHTML = `<div class="empty">暂无精灵</div>`;
+            return;
+        }
+
+        inventoryDiv.innerHTML = "";
+
+        inventory.forEach((monster, index) => {
+            const item = document.createElement("div");
+            item.className = "bag-item";
+
+            item.innerHTML = `
+                <div class="bag-item-left">
+                    <img class="bag-item-img" src="${monster.image}">
+                    <div>
+                        <strong>${monster.name}</strong>
+                        <span style="color:${monster.rarity === 'SSR' ? '#fbbf24' : '#fff'}">(${monster.rarity})</span>
+                    </div>
+                </div>
+                <button class="sell-btn" onclick="sellOne(${index})">
+                    出售 +${monster.sell}
+                </button>
+            `;
+            inventoryDiv.appendChild(item);
+        });
+    }
+
+    function sellOne(index) {
+        gold += inventory[index].sell;
+        inventory.splice(index, 1);
+        updateGold();
+        renderInventory();
+        saveDataToStorage();
+    }
+
+    function sellAll() {
+        if (inventory.length === 0) {
+            alert("背包是空的");
+            return;
+        }
+
+        let total = 0;
+        inventory.forEach(m => {
+            total += m.sell;
+        });
+
+        gold += total;
+        inventory = [];
+
+        updateGold();
+        renderInventory();
+        saveDataToStorage();
+        alert("成功出售全部精灵，获得 " + total + " 金币");
+    }
+
+    // 后台管理功能逻辑
+    function openAdmin() {
+        const psw = prompt("请输入后台管理密码：");
+        if (psw === ADMIN_PASSWORD) {
+            document.getElementById("input-gold").value = gold;
+            document.getElementById("input-price-N").value = prices["N"];
+            document.getElementById("input-price-R").value = prices["R"];
+            document.getElementById("input-price-SR").value = prices["SR"];
+            document.getElementById("input-price-SSR").value = prices["SSR"];
+            document.getElementById("adminModal").style.display = "flex";
+        } else if (psw !== null) {
+            alert("密码错误，拒绝访问！");
+        }
+    }
+
+    function closeAdmin() {
+        document.getElementById("adminModal").style.display = "none";
+    }
+
+    function saveAdminData() {
+        const newGold = parseInt(document.getElementById("input-gold").value);
+        const newN = parseInt(document.getElementById("input-price-N").value);
+        const newR = parseInt(document.getElementById("input-price-R").value);
+        const newSR = parseInt(document.getElementById("input-price-SR").value);
+        const newSSR = parseInt(document.getElementById("input-price-SSR").value);
+
+        if (isNaN(newGold) || isNaN(newN) || isNaN(newR) || isNaN(newSR) || isNaN(newSSR)) {
+            alert("请输入合法的数字！");
+            return;
+        }
+
+        gold = newGold;
+        prices["N"] = newN;
+        prices["R"] = newR;
+        prices["SR"] = newSR;
+        prices["SSR"] = newSSR;
+
+        // 同步历史背包里精灵的回收价值，确保已抽出来的卡也能按新价格卖
+        inventory.forEach(m => {
+            if (prices[m.rarity]) {
+                m.sell = prices[m.rarity];
+            }
+        });
+
+        updateGold();
+        updatePriceLabels();
+        renderInventory();
+        saveDataToStorage();
+
+        alert("后台修改成功并已保存！");
+        closeAdmin();
+    }
+
+    // 初始化运行
+    updateGold();
+    updatePriceLabels();
+    renderInventory();
+</script>
+
+</body>
+</html>
+
+```
