@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🌟 Power Go Premium 4.5 安全防注锁商用版 🌟</title>
+    <title>🌟 Power Go Premium 4.6 动态回收价商用版 🌟</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         /* ==================== 👑 全局变量与手机端适配重构 👑 ==================== */
@@ -268,13 +268,13 @@
             max-width: 400px;
             margin: 40px auto;
             box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            display: block; /* 显式声明默认拦截显现 */
+            display: block; 
         }
         .lock-title { font-size: 18px; font-weight: bold; color: var(--color-ur); margin-bottom: 10px; }
         .lock-tip { font-size: 13px; color: #64748b; margin-bottom: 20px; }
 
         /* ==================== 🛠️ 可视化高级配置后台管理系统 ==================== */
-        .admin-real-content { display: none; } /* 严禁默认暴漏核心代码 */
+        .admin-real-content { display: none; } 
         .admin-section { background: #161925; padding: 15px; border-radius: 12px; border: 1px solid #2d3446; margin-bottom: 20px; }
         .admin-section-title { font-size: 16px; font-weight: bold; color: var(--primary); margin-bottom: 12px; border-left: 4px solid var(--primary); padding-left: 8px; }
         .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
@@ -310,7 +310,7 @@
 
     <div class="header-bar">
         <div class="header-top">
-            <div class="brand-title">POWER GO 4.5</div>
+            <div class="brand-title">POWER GO 4.6</div>
             <div class="gold-badge">🪙 <span id="goldVal">5000</span></div>
         </div>
         <div class="search-container">
@@ -360,6 +360,36 @@
                     <input type="number" id="gmGoldIn" class="form-control" style="color:var(--primary); font-weight:bold;">
                 </div>
                 <button class="admin-btn" onclick="saveGmGold()">即刻划拨资产</button>
+            </div>
+
+            <div class="admin-section">
+                <div class="admin-section-title">💰 全局卡片出售回收价格调配</div>
+                <p style="color:#64748b; font-size:11px; margin-bottom:10px;">在这里可以随意修改各级别卡片卖给系统时的回收价格（单位：🪙金币）</p>
+                <div class="admin-row">
+                    <div class="form-group">
+                        <label>N级回收价</label>
+                        <input type="number" id="priceN" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>R级回收价</label>
+                        <input type="number" id="priceR" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>SR级回收价</label>
+                        <input type="number" id="priceSR" class="form-control">
+                    </div>
+                </div>
+                <div class="admin-row">
+                    <div class="form-group">
+                        <label>SSR级回收价</label>
+                        <input type="number" id="priceSSR" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>UR级回收价</label>
+                        <input type="number" id="priceUR" class="form-control">
+                    </div>
+                </div>
+                <button class="admin-btn" style="background:linear-gradient(135deg, #10b981, #059669);" onclick="saveRecoverPrices()">确认更新全国回收金卡价</button>
             </div>
 
             <div class="admin-section">
@@ -537,11 +567,14 @@
     let gold = localStorage.getItem("pg_gold_4") !== null ? parseInt(localStorage.getItem("pg_gold_4")) : 5000;
     let warehouse = localStorage.getItem("pg_warehouse_4") !== null ? JSON.parse(localStorage.getItem("pg_warehouse_4")) : [];
     
-    // 后台独立核心安全密钥锁逻辑
+    // 后台独立核心安全密钥锁
     let adminPassword = localStorage.getItem("pg_admin_pwd") !== null ? localStorage.getItem("pg_admin_pwd") : "888888";
 
+    // 💰 回收价格核心矩阵（支持动态缓存读取）
+    const DEFAULT_RECOVER_PRICES = { "N": 10, "R": 50, "SR": 200, "SSR": 800, "UR": 3000 };
+    let recoverPrices = localStorage.getItem("pg_recover_prices") !== null ? JSON.parse(localStorage.getItem("pg_recover_prices")) : DEFAULT_RECOVER_PRICES;
+
     const RATES = { "UR": 0.2, "SSR": 2.8, "SR": 5.0, "R": 12.0, "N": 80.0 };
-    const RECOVER_PRICES = { "N": 10, "R": 50, "SR": 200, "SSR": 800, "UR": 3000 };
 
     let viewQueue = [];
     let queueIdx = 0;
@@ -555,6 +588,7 @@
         renderPacksMarket();
         renderWarehouseView();
         buildAdminPackSelector();
+        initAdminPricesForm(); // 装载回收价格到表单
         document.getElementById("gmGoldIn").value = gold;
     };
 
@@ -565,6 +599,27 @@
 
     function saveLocalStorageData() {
         localStorage.setItem("pg_packs_4", JSON.stringify(PACKS_CONFIG));
+    }
+
+    // ==================== 💰 动态回收价格核心控制 ====================
+    function initAdminPricesForm() {
+        document.getElementById("priceN").value = recoverPrices["N"];
+        document.getElementById("priceR").value = recoverPrices["R"];
+        document.getElementById("priceSR").value = recoverPrices["SR"];
+        document.getElementById("priceSSR").value = recoverPrices["SSR"];
+        document.getElementById("priceUR").value = recoverPrices["UR"];
+    }
+
+    function saveRecoverPrices() {
+        recoverPrices["N"] = parseInt(document.getElementById("priceN").value) || 0;
+        recoverPrices["R"] = parseInt(document.getElementById("priceR").value) || 0;
+        recoverPrices["SR"] = parseInt(document.getElementById("priceSR").value) || 0;
+        recoverPrices["SSR"] = parseInt(document.getElementById("priceSSR").value) || 0;
+        recoverPrices["UR"] = parseInt(document.getElementById("priceUR").value) || 0;
+
+        localStorage.setItem("pg_recover_prices", JSON.stringify(recoverPrices));
+        renderWarehouseView(); // 即时刷新仓库内显示的回收价
+        alert("💰 全局卡片回收出售价格已重新洗牌！");
     }
 
     // ==================== 🔑 后台密码核验安全锁逻辑 ====================
@@ -591,7 +646,7 @@
         document.getElementById("newAdminPwd").value = "";
     }
 
-    // ==================== 📱 单页架构导航控制（防穿透重构） ====================
+    // ==================== 📱 单页架构导航控制 ====================
     function switchTab(targetId, el) {
         document.querySelectorAll(".view-section").forEach(sec => sec.classList.remove("active"));
         document.querySelectorAll(".nav-item").forEach(item => item.classList.remove("active"));
@@ -599,7 +654,6 @@
         document.getElementById("view-" + targetId).classList.add("active");
         el.classList.add("active");
 
-        // 🛡️ 防穿透核心：无论什么时候切进后台，无条件瞬间锁定真实视图，逼迫其走验证
         if(targetId === 'gm') {
             document.getElementById("adminLockWall").style.display = "block";
             document.getElementById("adminRealView").style.display = "none";
@@ -702,7 +756,8 @@
             
             let rolled = filteredPool[Math.floor(Math.random() * filteredPool.length)];
             viewQueue.push(rolled);
-            warehouse.push({ ...rolled, sellPrice: RECOVER_PRICES[rolled.rarity] || 10 });
+            // 抽卡写入仓库时动态与当前全局回收价热绑定
+            warehouse.push({ ...rolled });
         }
 
         queueIdx = 0;
@@ -759,20 +814,25 @@
         
         container.innerHTML = "";
         displayList.forEach((m, idx) => {
+            // 实时获取配置里的最新价格，防止后台修改后旧卡对不上
+            let dynamicPrice = recoverPrices[m.rarity] !== undefined ? recoverPrices[m.rarity] : 10;
             const node = document.createElement("div");
             node.className = `bag-item border-${m.rarity}`;
             node.innerHTML = `
                 <img class="bag-item-img" src="${m.image}">
                 <div class="bag-item-name">${m.name}</div>
                 <div class="bag-item-rarity" style="color:var(--color-${m.rarity.toLowerCase()})">${m.rarity}</div>
-                <button class="cell-action-btn" onclick="recycleOneItem(${idx})">回收 +${m.sellPrice}</button>
+                <button class="cell-action-btn" onclick="recycleOneItem(${idx})">回收 +${dynamicPrice}</button>
             `;
             container.appendChild(node);
         });
     }
 
     function recycleOneItem(index) {
-        gold += warehouse[index].sellPrice;
+        let cardRarity = warehouse[index].rarity;
+        let dynamicPrice = recoverPrices[cardRarity] !== undefined ? recoverPrices[cardRarity] : 10;
+        
+        gold += dynamicPrice;
         warehouse.splice(index, 1);
         updateGoldDisplay();
         renderWarehouseView();
@@ -782,13 +842,16 @@
     function sellAllWarehouse() {
         if (warehouse.length === 0) return;
         let total = 0;
-        warehouse.forEach(item => total += item.sellPrice);
+        warehouse.forEach(item => {
+            let dynamicPrice = recoverPrices[item.rarity] !== undefined ? recoverPrices[item.rarity] : 10;
+            total += dynamicPrice;
+        });
         gold += total;
         warehouse = [];
         updateGoldDisplay();
         renderWarehouseView();
         localStorage.setItem("pg_warehouse_4", JSON.stringify(warehouse));
-        alert(`💰 仓库清理成功，回笼资产 ${total} 金币！`);
+        alert(`💰 仓库清理成功，按最新金价回笼资产 ${total} 金币！`);
     }
 
     // ==================== 🛠️ 可视化管理后台系统 ====================
