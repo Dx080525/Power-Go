@@ -789,46 +789,66 @@
     }
 
     // ==================== 🎲 抽卡核心算法 ====================
-    function executeDrawCore(times) {
-        const pack = PACKS_CONFIG.find(p => p.id === selectedPackId);
-        const totalCost = pack.cost * times;
+   function executeDrawCore(times) {
+    const pack = PACKS_CONFIG.find(p => p.id === selectedPackId);
+    const totalCost = pack.cost * times;
 
-        if (gold < totalCost) {
-            alert("🪙 余额不足！请前去高级后台充值，或回收卡片。");
-            return;
-        }
-
-        gold -= totalCost;
-        updateGoldDisplay();
-
-        viewQueue = [];
-        // 动态边界计算，实时吃掉最新的 RATES 控制爆率
-        let bUR = RATES["UR"];
-        let bSSR = bUR + RATES["SSR"];
-        let bSR = bSSR + RATES["SR"];
-        let bR = bSR + RATES["R"];
-
-        for (let i = 0; i < times; i++) {
-            let roll = Math.random() * 100;
-            let rarity = "N";
-
-            if (roll < bUR) rarity = "UR";
-            else if (roll < bSSR) rarity = "SSR";
-            else if (roll < bSR) rarity = "SR";
-            else if (roll < bR) rarity = "R";
-
-            let filteredPool = pack.pool.filter(m => m.rarity === rarity);
-            if(filteredPool.length === 0) filteredPool = pack.pool;
-            
-            let rolled = filteredPool[Math.floor(Math.random() * filteredPool.length)];
-            viewQueue.push(rolled);
-            warehouse.push({ ...rolled });
-        }
-
-        queueIdx = 0;
-        document.getElementById("showcardOverlay").style.display = "flex";
-        triggerNextQueuedCard();
+    if (gold < totalCost) {
+        alert("🪙 余额不足！请前去高级后台充值，或回收卡片。");
+        return;
     }
+
+    gold -= totalCost;
+    updateGoldDisplay();
+
+    viewQueue = [];
+
+    // 计算概率边界（实时吃后台 RATES 变量）
+    let bUR = RATES["UR"];
+    let bSSR = bUR + RATES["SSR"];
+    let bSR = bSSR + RATES["SR"];
+    let bR = bSR + RATES["R"];
+
+    for (let i = 0; i < times; i++) {
+        let roll = Math.random() * 100;
+        let rarity = "N";
+
+        if (roll < bUR) rarity = "UR";
+        else if (roll < bSSR) rarity = "SSR";
+        else if (roll < bSR) rarity = "SR";
+        else if (roll < bR) rarity = "R";
+
+        // ⭐【核心修正1】：精准对接你图1中的全厂总卡池 monsters
+        let filteredPool = monsters.filter(m => m.rarity === rarity);
+
+        // ⭐【核心修正2】：严格防穿透保底！如果该级别没卡，依次向下级寻找，绝不允许向上全池盲随机！
+        if (filteredPool.length === 0) {
+            const fallbacks = ["SSR", "SR", "R", "N"];
+            for (let f of fallbacks) {
+                filteredPool = monsters.filter(m => m.rarity === f);
+                if (filteredPool.length > 0) break;
+            }
+        }
+
+        // 最终极端兜底
+        if (filteredPool.length === 0) filteredPool = monsters;
+
+        // 随机抓取一张卡
+        let rolled = filteredPool[Math.floor(Math.random() * filteredPool.length)];
+        viewQueue.push(rolled);
+        
+        // ⭐【核心修正3】：精准存入你图1中定义的系统仓库变量 inventory
+        inventory.push({ ...rolled });
+    }
+
+    // ⭐【尾巴 1】：触发切卡展台动画
+    queueIdx = 0;
+    document.getElementById("showcardOverlay").style.display = "flex";
+    triggerNextQueuedCard();
+
+    // ⭐【尾巴 2】：数据真正写入本地缓存
+    localStorage.setItem("pg_inventory", JSON.stringify(inventory));
+}
 
     function triggerNextQueuedCard() {
         const giantCard = document.getElementById("giantCard");
