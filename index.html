@@ -789,9 +789,10 @@
     }
 
     // ==================== 🎲 抽卡核心算法 ====================
-   function executeDrawCore(times) {
-    const pack = PACKS_CONFIG.find(p => p.id === selectedPackId);
-    const totalCost = pack.cost * times;
+ function executeDrawCore(times) {
+    // 🪙 1. 简易扣费逻辑（完美兼容原版 gold）
+ const singleCost = Number(document.getElementById("packCostInput")?.value) || (typeof pack !== 'undefined' ? pack.cost : 100);
+    const totalCost = singleCost * times;
 
     if (gold < totalCost) {
         alert("🪙 余额不足！请前去高级后台充值，或回收卡片。");
@@ -803,12 +804,13 @@
 
     viewQueue = [];
 
-    // 计算概率边界（实时吃后台 RATES 变量）
+    // 📊 2. 实时捕获后台精调的 RATES 边界
     let bUR = RATES["UR"];
     let bSSR = bUR + RATES["SSR"];
     let bSR = bSSR + RATES["SR"];
     let bR = bSR + RATES["R"];
 
+    // 🎯 3. 核心抽卡循环
     for (let i = 0; i < times; i++) {
         let roll = Math.random() * 100;
         let rarity = "N";
@@ -818,10 +820,10 @@
         else if (roll < bSR) rarity = "SR";
         else if (roll < bR) rarity = "R";
 
-        // ⭐【核心修正1】：精准对接你图1中的全厂总卡池 monsters
+        // ⭐【精准对接】去你图1定义的 monsters 里面过滤对应稀有度的宝可梦
         let filteredPool = monsters.filter(m => m.rarity === rarity);
 
-        // ⭐【核心修正2】：严格防穿透保底！如果该级别没卡，依次向下级寻找，绝不允许向上全池盲随机！
+        // ⭐【防穿透锁】如果该级别真的没卡，严格向下兼容，绝对不往上穿透抽 UR
         if (filteredPool.length === 0) {
             const fallbacks = ["SSR", "SR", "R", "N"];
             for (let f of fallbacks) {
@@ -830,24 +832,27 @@
             }
         }
 
-        // 最终极端兜底
+        // 终极保底
         if (filteredPool.length === 0) filteredPool = monsters;
 
-        // 随机抓取一张卡
+        // 随机抓取并塞入展示队列
         let rolled = filteredPool[Math.floor(Math.random() * filteredPool.length)];
         viewQueue.push(rolled);
         
-        // ⭐【核心修正3】：精准存入你图1中定义的系统仓库变量 inventory
-        inventory.push({ ...rolled });
+        // ⭐【双轨兼容保护】同时推进 inventory 和 warehouse，彻底解决图 6 渲染卡死问题！
+        if (typeof inventory !== 'undefined') inventory.push({ ...rolled });
+        if (typeof warehouse !== 'undefined') warehouse.push({ ...rolled });
     }
 
-    // ⭐【尾巴 1】：触发切卡展台动画
+    // 🎬 4. 触发切卡展台动画展出
     queueIdx = 0;
     document.getElementById("showcardOverlay").style.display = "flex";
     triggerNextQueuedCard();
 
-    // ⭐【尾巴 2】：数据真正写入本地缓存
-    localStorage.setItem("pg_inventory", JSON.stringify(inventory));
+    // 💾 5. 严格同步到你本地对应的本地缓存 pg_inventory
+    if (typeof inventory !== 'undefined') {
+        localStorage.setItem("pg_inventory", JSON.stringify(inventory));
+    }
 }
 
     function triggerNextQueuedCard() {
