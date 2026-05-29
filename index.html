@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🌟 Power Go Premium 4.5 安全升级商用版 🌟</title>
+    <title>🌟 Power Go Premium 4.5 安全防注锁商用版 🌟</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         /* ==================== 👑 全局变量与手机端适配重构 👑 ==================== */
@@ -268,12 +268,13 @@
             max-width: 400px;
             margin: 40px auto;
             box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            display: block; /* 显式声明默认拦截显现 */
         }
         .lock-title { font-size: 18px; font-weight: bold; color: var(--color-ur); margin-bottom: 10px; }
         .lock-tip { font-size: 13px; color: #64748b; margin-bottom: 20px; }
 
         /* ==================== 🛠️ 可视化高级配置后台管理系统 ==================== */
-        .admin-real-content { display: none; } /* 默认隐藏真正后台内容 */
+        .admin-real-content { display: none; } /* 严禁默认暴漏核心代码 */
         .admin-section { background: #161925; padding: 15px; border-radius: 12px; border: 1px solid #2d3446; margin-bottom: 20px; }
         .admin-section-title { font-size: 16px; font-weight: bold; color: var(--primary); margin-bottom: 12px; border-left: 4px solid var(--primary); padding-left: 8px; }
         .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
@@ -573,7 +574,7 @@
             document.getElementById("adminLockWall").style.display = "none";
             document.getElementById("adminRealView").style.display = "block";
         } else {
-            alert("❌ 密码错误！非法越权，拒绝访问。");
+            alert("❌ 密码错误！高级后台已拒绝此次越权访问。");
             document.getElementById("adminPwdInput").value = "";
         }
     }
@@ -590,15 +591,16 @@
         document.getElementById("newAdminPwd").value = "";
     }
 
-    // ==================== 📱 单页架构导航控制 ====================
+    // ==================== 📱 单页架构导航控制（防穿透重构） ====================
     function switchTab(targetId, el) {
         document.querySelectorAll(".view-section").forEach(sec => sec.classList.remove("active"));
         document.querySelectorAll(".nav-item").forEach(item => item.classList.remove("active"));
+        
         document.getElementById("view-" + targetId).classList.add("active");
         el.classList.add("active");
 
-        // 离开后台标签页时，自动将后台重新上锁，确保高安全性
-        if(targetId !== 'gm') {
+        // 🛡️ 防穿透核心：无论什么时候切进后台，无条件瞬间锁定真实视图，逼迫其走验证
+        if(targetId === 'gm') {
             document.getElementById("adminLockWall").style.display = "block";
             document.getElementById("adminRealView").style.display = "none";
             document.getElementById("adminPwdInput").value = "";
