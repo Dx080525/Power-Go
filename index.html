@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>宝可梦爆裂抽卡系统 - 重制版</title>
+    <title>宝可梦爆裂抽卡系统 - 完结修复版</title>
     <style>
         /* ==================== 👑 纯视觉大厂高档特效 👑 ==================== */
         /* SSR卡牌的璀璨金边 */
@@ -98,7 +98,7 @@
             cursor: pointer;
             transition: all 0.2s;
             color: white;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 14 rgba(0,0,0,0.3);
         }
 
         .btn-single { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
@@ -212,13 +212,10 @@
 
 <script>
     // 价格体系数据
-    let prices = localStorage.getItem("pg_prices") !== null ? JSON.parse(localStorage.getItem("pg_prices")) : {
-        "N": 10, "R": 80, "SR": 800, "SSR": 3500, "UR": 9999
-    };
+    let prices = { "N": 10, "R": 80, "SR": 800, "SSR": 3500, "UR": 9999 };
 
-    // 🌟 全套 30 只高清正版卡池数据列表（对应图 35）
+    // 🌟 30只高清正版卡池数据列表
     const monsters = [
-        // ========== N 级别：普通基础 (9种) ==========
         { name: "妙蛙种子", rarity: "N", image: "https://asia.pokemon-card.com/hk/card-img/hk00008867.png" },
         { name: "小火龙", rarity: "N", image: "https://asia.pokemon-card.com/hk/card-img/hk00004944.png" },
         { name: "杰尼龟", rarity: "N", image: "https://asia.pokemon-card.com/hk/card-img/hk00004953.png" },
@@ -229,7 +226,6 @@
         { name: "小磁怪", rarity: "N", image: "https://asia.pokemon-card.com/hk/card-img/hk00006361.png" },
         { name: "地鼠", rarity: "N", image: "https://asia.pokemon-card.com/hk/card-img/hk00003039.png" },
 
-        // ========== R 级别：稀有闪卡 (8种) ==========
         { name: "比雕 (大比鸟)", rarity: "R", image: "https://asia.pokemon-card.com/hk/card-img/hk00003243.png" },
         { name: "大针蜂", rarity: "R", image: "https://asia.pokemon-card.com/tw/card-img/tw00018423.png" },
         { name: "胖丁", rarity: "R", image: "https://asia.pokemon-card.com/hk/card-img/hk00003028.png" },
@@ -239,7 +235,6 @@
         { name: "暴鲤龙", rarity: "R", image: "https://asia.pokemon-card.com/hk/card-img/hk00004961.png" },
         { name: "卡比兽", rarity: "R", image: "https://asia.pokemon-card.com/hk/card-img/hk00006450.png" },
 
-        // ========== SR 级别：超级稀有/强力进化 (6种) ==========
         { name: "快龙 ex", rarity: "SR", image: "https://asia.pokemon-card.com/hk/card-img/hk00007886.png" },
         { name: "巨金怪 ex", rarity: "SR", image: "https://asia.pokemon-card.com/hk/card-img/hk00007890.png" },
         { name: "轰鸣月 ex", rarity: "SR", image: "https://asia.pokemon-card.com/hk/card-img/hk00007662.png" },
@@ -247,14 +242,12 @@
         { name: "班基拉斯 ex", rarity: "SR", image: "https://asia.pokemon-card.com/hk/card-img/hk00007135.png" },
         { name: "赛富豪 ex", rarity: "SR", image: "https://asia.pokemon-card.com/hk/card-img/hk00004245.png" },
 
-        // ========== SSR 级别：传说特写/爆率狂欢 (5种) ==========
         { name: "喷火龙 ex", rarity: "SSR", image: "https://q7.itc.cn/images01/20211028/5ebb6de3597743ef9dda4adb8a27406b.png" },
         { name: "皮卡丘 ex", rarity: "SSR", image: "https://asia.pokemon-card.com/tw/card-img/tw00018367.png" },
         { name: "甲贺忍蛙 ex", rarity: "SSR", image: "https://asia.pokemon-card.com/hk/card-img/hk00008518.png" },
         { name: "超梦 ex", rarity: "SSR", image: "https://asia.pokemon-card.com/hk/card-img/hk00008119.png" },
         { name: "烈空坐", rarity: "SSR", image: "https://asia.pokemon-card.com/hk/card-img/hk00004381.png" },
 
-        // ========== UR 级别：金色终极神话 (2种) ==========
         { name: "金色·阿尔宙斯 VSTAR", rarity: "UR", image: "https://asia.pokemon-card.com/tw/card-img/tw00047244.png" },
         { name: "金色·骑拉帝纳 VSTAR", rarity: "UR", image: "https://asia.pokemon-card.com/tw/card-img/tw00006201.png" }
     ];
@@ -265,7 +258,6 @@
     let cardQueue = [];
     let currentQueueIndex = 0;
 
-    // 初始化加载
     window.onload = function() {
         updateGold();
         renderInventory();
@@ -275,7 +267,6 @@
         document.getElementById("gold").innerText = gold;
     }
 
-    // 核心抽卡池算法（纯粹概率）
     function draw(times) {
         const cost = times * 10;
         if (gold < cost) {
@@ -293,14 +284,12 @@
             let roll = Math.random() * 100;
             let selectedRarity = "N";
 
-            // 爆率分配：UR 0.3%, SSR 2.7%, SR 12%, R 25%, N 60%
             if (roll < 0.3) selectedRarity = "UR";
             else if (roll < 3.0) selectedRarity = "SSR";
             else if (roll < 15.0) selectedRarity = "SR";
             else if (roll < 40.0) selectedRarity = "R";
             else selectedRarity = "N";
 
-            // 从选中的稀有度池子里随机抓一只
             let pool = monsters.filter(m => m.rarity === selectedRarity);
             let rolledMonster = pool[Math.floor(Math.random() * pool.length)];
 
@@ -314,7 +303,6 @@
         showNextCardInQueue();
     }
 
-    // 🌟 翻卡大本营逻辑（对应图 29 与 图 31）
     function showNextCardInQueue() {
         const giantCard = document.getElementById("giantCard");
         const stage = document.getElementById("showcardOverlay");
@@ -339,7 +327,6 @@
         }
 
         setTimeout(() => {
-            // 对齐最新的 CSS 暗号类名
             giantCard.className = `giant-card g-${monster.rarity}`;
             giantCard.innerHTML = `
                 <div class="giant-rarity">${monster.rarity}</div>
@@ -350,16 +337,14 @@
             `;
 
             giantCard.classList.add("pop-up");
-
             currentQueueIndex++;
 
-            // 🌟 精准触发大厂级特效触发器
+            // 👑 干净触发大厂特效
             applyHighEndEffects(monster.rarity);
 
         }, 150);
     }
 
-    // 渲染本次抽取的底侧网格结果
     function renderBottomResultGrid() {
         const grid = document.getElementById("result-grid");
         grid.innerHTML = "";
@@ -379,7 +364,6 @@
         });
     }
 
-    // 🌟 渲染我的卡牌仓库列表（包含卖出按钮，对应图 39）
     function renderInventory() {
         const container = document.getElementById("inventory");
         if (inventory.length === 0) {
@@ -404,7 +388,6 @@
         });
     }
 
-    // 卖出一张卡牌
     function sellOne(index) {
         gold += inventory[index].sell;
         inventory.splice(index, 1);
@@ -413,32 +396,25 @@
         saveDataToStorage();
     }
 
-    // 保存本地数据
     function saveDataToStorage() {
         localStorage.setItem("pg_gold", gold);
         localStorage.setItem("pg_inventory", JSON.stringify(inventory));
     }
 
-    // ==================== 👑 全屏视觉大厂高档特效触发器 👑 ====================
     function applyHighEndEffects(rarity) {
-        // 每次翻卡前，干净清除上一次的震动状态
         document.body.classList.remove("screen-shake");
 
         if (rarity === "UR") {
-            // 0.3% 究极神话出货！瞬间激活全屏剧烈物理震动
             setTimeout(() => document.body.classList.add("screen-shake"), 5);
             
-            // 屏幕上方凌空砸下一道写着【金色神话横幅】
             let urBanner = document.createElement("div");
             urBanner.innerHTML = "✨ 👑 究极神话 UR 诞生 👑 ✨";
             urBanner.style = "position:fixed; top:15%; left:50%; transform:translate(-50%,-50%); color:#eab308; font-size:42px; font-weight:bold; text-shadow:0 0 25px #eab308, 0 0 5px #fff; z-index:99999; text-align:center; width:100%; pointer-events:none; font-family:'Microsoft YaHei',sans-serif;";
             document.body.appendChild(urBanner);
             
-            // 狂震 2.5 秒后，自动消失，并恢复平静
             setTimeout(() => { urBanner.remove(); document.body.classList.remove("screen-shake"); }, 2500);
         } 
         else if (rarity === "SSR") {
-            // 2.7% 传说出货！拉起金光横幅
             let ssrBanner = document.createElement("div");
             ssrBanner.innerHTML = "🌟 传说级 SSR 出货 🌟";
             ssrBanner.style = "position:fixed; top:15%; left:50%; transform:translate(-50%,-50%); color:#fbbf24; font-size:32px; font-weight:bold; text-shadow:0 0 15px #fbbf24; z-index:99999; text-align:center; width:100%; pointer-events:none; font-family:'Microsoft YaHei',sans-serif;";
