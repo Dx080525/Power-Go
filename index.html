@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🌟 Power Go Premium 4.0 旗舰商用版 🌟</title>
+    <title>🌟 Power Go Premium 4.5 安全升级商用版 🌟</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         /* ==================== 👑 全局变量与手机端适配重构 👑 ==================== */
@@ -107,7 +107,7 @@
             padding: 5px 0;
             width: 100%;
         }
-        .category-scroll::-webkit-scrollbar { display: none; } /* 隐藏滚动条 */
+        .category-scroll::-webkit-scrollbar { display: none; } 
 
         .category-tag {
             white-space: nowrap;
@@ -258,7 +258,22 @@
 
         @keyframes pulseUR { 0% { transform: scale(1); } 100% { transform: scale(1.02); filter: brightness(1.1); } }
 
-        /* ==================== ⚙️ 可视化高级配置后台管理系统 ==================== */
+        /* ==================== 🔑 密码验证锁定面板 ==================== */
+        .lock-container {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 30px 20px;
+            border: 1px solid #2a2e45;
+            text-align: center;
+            max-width: 400px;
+            margin: 40px auto;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+        .lock-title { font-size: 18px; font-weight: bold; color: var(--color-ur); margin-bottom: 10px; }
+        .lock-tip { font-size: 13px; color: #64748b; margin-bottom: 20px; }
+
+        /* ==================== 🛠️ 可视化高级配置后台管理系统 ==================== */
+        .admin-real-content { display: none; } /* 默认隐藏真正后台内容 */
         .admin-section { background: #161925; padding: 15px; border-radius: 12px; border: 1px solid #2d3446; margin-bottom: 20px; }
         .admin-section-title { font-size: 16px; font-weight: bold; color: var(--primary); margin-bottom: 12px; border-left: 4px solid var(--primary); padding-left: 8px; }
         .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
@@ -294,7 +309,7 @@
 
     <div class="header-bar">
         <div class="header-top">
-            <div class="brand-title">POWER GO 4.0</div>
+            <div class="brand-title">POWER GO 4.5</div>
             <div class="gold-badge">🪙 <span id="goldVal">5000</span></div>
         </div>
         <div class="search-container">
@@ -324,69 +339,89 @@
     </div>
 
     <div id="view-gm" class="view-section">
-        <h2>🛠️ 核心运营可视化管理后台</h2>
-        <p style="color:#94a3b8; font-size:12px; margin-bottom:15px;">此处数据实时热同步本地缓存，无需修改任何底层源码代码！</p>
         
-        <div class="admin-section">
-            <div class="admin-section-title">🪙 用户账户资金划拨</div>
+        <div id="adminLockWall" class="lock-container">
+            <div class="lock-title">🛑 核心业务配置管理层已锁定</div>
+            <div class="lock-tip">非运营管理人员切勿尝试非法试探渗透</div>
             <div class="form-group">
-                <input type="number" id="gmGoldIn" class="form-control" style="color:var(--primary); font-weight:bold;">
+                <input type="password" id="adminPwdInput" class="form-control" style="text-align:center; letter-spacing:5px;" placeholder="请输入管理员秘钥">
             </div>
-            <button class="admin-btn" onclick="saveGmGold()">即刻划拨资产</button>
+            <button class="admin-btn" style="background:linear-gradient(135deg, #ef4444, #b91c1c);" onclick="verifyAdminPassword()">核验身份进入后台</button>
         </div>
 
-        <div class="admin-section">
-            <div class="admin-section-title">🖼️ 卡包封面与参数可视化配置</div>
-            <div class="form-group">
-                <label>选择要修改的卡包系列</label>
-                <select id="adminPackSelect" class="pack-selector" onchange="loadPackToAdminForm()"></select>
-            </div>
-            <div class="form-group">
-                <label>卡包名称</label>
-                <input type="text" id="adminPackTitle" class="form-control">
-            </div>
-            <div class="form-group">
-                <label>卡包标签描述</label>
-                <input type="text" id="adminPackTag" class="form-control">
-            </div>
-            <div class="form-group">
-                <label>卡包封面图片链接 (替换此链接即可更换展示封面)</label>
-                <input type="text" id="adminPackBanner" class="form-control">
-            </div>
-            <div class="form-group">
-                <label>单抽价格 (🪙)</label>
-                <input type="number" id="adminPackCost" class="form-control">
-            </div>
-            <button class="admin-btn" onclick="savePackBasicConfig()">保存卡包基本配置</button>
-        </div>
-
-        <div class="admin-section">
-            <div class="admin-section-title">➕ 动态扩充卡包核心卡池内容</div>
-            <p style="color:#64748b; font-size:11px; margin-bottom:8px;">向当前选中的卡包内直接注资增加全新可被抽出的角色卡：</p>
-            <div class="form-group">
-                <label>卡片名称</label>
-                <input type="text" id="newCardName" class="form-control" placeholder="例如：路飞 五档 Gear5">
-            </div>
-            <div class="admin-row">
+        <div id="adminRealView" class="admin-real-content">
+            <h2>🛠️ 核心运营可视化管理后台</h2>
+            <p style="color:#22c55e; font-size:12px; margin-bottom:15px; font-weight:bold;">🟢 管理员身份认证成功，数据热同步已就绪。</p>
+            
+            <div class="admin-section">
+                <div class="admin-section-title">🪙 用户账户资金划拨</div>
                 <div class="form-group">
-                    <label>稀有度级别</label>
-                    <select id="newCardRarity" class="form-control">
-                        <option value="N">N (80%)</option>
-                        <option value="R">R (12%)</option>
-                        <option value="SR">SR (5%)</option>
-                        <option value="SSR">SSR (2.8%)</option>
-                        <option value="UR">UR (0.2%)</option>
-                    </select>
+                    <input type="number" id="gmGoldIn" class="form-control" style="color:var(--primary); font-weight:bold;">
                 </div>
+                <button class="admin-btn" onclick="saveGmGold()">即刻划拨资产</button>
             </div>
-            <div class="form-group">
-                <label>卡片立绘静态图片网络链接</label>
-                <input type="text" id="newCardImage" class="form-control" placeholder="https://example.com/card.png">
-            </div>
-            <button class="admin-btn" style="background:linear-gradient(135deg, #a855f7, #7e22ce);" onclick="addNewCardToPool()">注入新角色卡进入卡池</button>
 
-            <label style="font-size: 12px; color: #94a3b8; display:block; margin-top:15px; margin-bottom:5px;">当前已有卡池内容预览</label>
-            <div id="adminPoolPreview" class="pool-preview-list"></div>
+            <div class="admin-section">
+                <div class="admin-section-title">🖼️ 卡包封面与参数可视化配置</div>
+                <div class="form-group">
+                    <label>选择要修改的卡包系列</label>
+                    <select id="adminPackSelect" class="pack-selector" onchange="loadPackToAdminForm()"></select>
+                </div>
+                <div class="form-group">
+                    <label>卡包名称</label>
+                    <input type="text" id="adminPackTitle" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>卡包标签描述</label>
+                    <input type="text" id="adminPackTag" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>卡包封面图片链接 (替换此链接即可更换展示封面)</label>
+                    <input type="text" id="adminPackBanner" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>单抽价格 (🪙)</label>
+                    <input type="number" id="adminPackCost" class="form-control">
+                </div>
+                <button class="admin-btn" onclick="savePackBasicConfig()">保存卡包基本配置</button>
+            </div>
+
+            <div class="admin-section">
+                <div class="admin-section-title">➕ 动态扩充卡包核心卡池内容</div>
+                <div class="form-group">
+                    <label>卡片名称</label>
+                    <input type="text" id="newCardName" class="form-control" placeholder="例如：路飞 五档 Gear5">
+                </div>
+                <div class="admin-row">
+                    <div class="form-group">
+                        <label>稀有度级别</label>
+                        <select id="newCardRarity" class="form-control">
+                            <option value="N">N (80%)</option>
+                            <option value="R">R (12%)</option>
+                            <option value="SR">SR (5%)</option>
+                            <option value="SSR">SSR (2.8%)</option>
+                            <option value="UR">UR (0.2%)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>卡片立绘静态图片网络链接</label>
+                    <input type="text" id="newCardImage" class="form-control" placeholder="https://example.com/card.png">
+                </div>
+                <button class="admin-btn" style="background:linear-gradient(135deg, #a855f7, #7e22ce);" onclick="addNewCardToPool()">注入新角色卡进入卡池</button>
+
+                <label style="font-size: 12px; color: #94a3b8; display:block; margin-top:15px; margin-bottom:5px;">当前已有卡池内容预览</label>
+                <div id="adminPoolPreview" class="pool-preview-list"></div>
+            </div>
+
+            <div class="admin-section">
+                <div class="admin-section-title">🔑 修改后台管理员密码</div>
+                <div class="form-group">
+                    <label>新密码</label>
+                    <input type="text" id="newAdminPwd" class="form-control" placeholder="输入新的安全控制密码">
+                </div>
+                <button class="admin-btn" style="background:linear-gradient(135deg, #4b5563, #1f2937);" onclick="changeAdminPassword()">确认修改控制密码</button>
+            </div>
         </div>
     </div>
 
@@ -433,7 +468,7 @@
     </div>
 
 <script>
-    // ==================== 📦 原生底层默认内置矩阵 (4大核心IP卡包) ====================
+    // ==================== 📦 原生底层默认内置配置数据矩阵 ====================
     const DEFAULT_PACKS_CONFIG = [
         {
             id: "pack_pokemon",
@@ -500,6 +535,9 @@
     let PACKS_CONFIG = localStorage.getItem("pg_packs_4") !== null ? JSON.parse(localStorage.getItem("pg_packs_4")) : DEFAULT_PACKS_CONFIG;
     let gold = localStorage.getItem("pg_gold_4") !== null ? parseInt(localStorage.getItem("pg_gold_4")) : 5000;
     let warehouse = localStorage.getItem("pg_warehouse_4") !== null ? JSON.parse(localStorage.getItem("pg_warehouse_4")) : [];
+    
+    // 后台独立核心安全密钥锁逻辑
+    let adminPassword = localStorage.getItem("pg_admin_pwd") !== null ? localStorage.getItem("pg_admin_pwd") : "888888";
 
     const RATES = { "UR": 0.2, "SSR": 2.8, "SR": 5.0, "R": 12.0, "N": 80.0 };
     const RECOVER_PRICES = { "N": 10, "R": 50, "SR": 200, "SSR": 800, "UR": 3000 };
@@ -528,12 +566,43 @@
         localStorage.setItem("pg_packs_4", JSON.stringify(PACKS_CONFIG));
     }
 
+    // ==================== 🔑 后台密码核验安全锁逻辑 ====================
+    function verifyAdminPassword() {
+        const input = document.getElementById("adminPwdInput").value;
+        if(input === adminPassword) {
+            document.getElementById("adminLockWall").style.display = "none";
+            document.getElementById("adminRealView").style.display = "block";
+        } else {
+            alert("❌ 密码错误！非法越权，拒绝访问。");
+            document.getElementById("adminPwdInput").value = "";
+        }
+    }
+
+    function changeAdminPassword() {
+        const newPwd = document.getElementById("newAdminPwd").value.trim();
+        if(newPwd === "") {
+            alert("⚠️ 密码不能为空！");
+            return;
+        }
+        adminPassword = newPwd;
+        localStorage.setItem("pg_admin_pwd", adminPassword);
+        alert(`🔑 密码修改成功！新密码已生效。`);
+        document.getElementById("newAdminPwd").value = "";
+    }
+
     // ==================== 📱 单页架构导航控制 ====================
     function switchTab(targetId, el) {
         document.querySelectorAll(".view-section").forEach(sec => sec.classList.remove("active"));
         document.querySelectorAll(".nav-item").forEach(item => item.classList.remove("active"));
         document.getElementById("view-" + targetId).classList.add("active");
         el.classList.add("active");
+
+        // 离开后台标签页时，自动将后台重新上锁，确保高安全性
+        if(targetId !== 'gm') {
+            document.getElementById("adminLockWall").style.display = "block";
+            document.getElementById("adminRealView").style.display = "none";
+            document.getElementById("adminPwdInput").value = "";
+        }
     }
 
     // ==================== 🏷️ 分区过滤与全局搜索 ====================
@@ -549,26 +618,17 @@
         renderWarehouseView();
     }
 
-    // 智能双重筛选渲染卡包列表
     function renderPacksMarket() {
         const grid = document.getElementById("packGridContainer");
         const keyword = document.getElementById("globalSearchInput").value.trim().toLowerCase();
         grid.innerHTML = "";
 
         let list = PACKS_CONFIG;
-        
-        // 1. IP分区过滤
-        if (currentIPFilter !== "all") {
-            list = list.filter(p => p.ip === currentIPFilter);
-        }
-
-        // 2. 关键字搜索过滤
-        if (keyword !== "") {
-            list = list.filter(p => p.title.toLowerCase().includes(keyword));
-        }
+        if (currentIPFilter !== "all") list = list.filter(p => p.ip === currentIPFilter);
+        if (keyword !== "") list = list.filter(p => p.title.toLowerCase().includes(keyword));
 
         if(list.length === 0) {
-            grid.innerHTML = `<div class="empty-tip">该分区内没有匹配关键字的卡包系列</div>`;
+            grid.innerHTML = `<div class="empty-tip">该分区内没有匹配的卡包系列</div>`;
             return;
         }
 
@@ -586,7 +646,7 @@
         });
     }
 
-    // ==================== 🚪 二级全屏卡包详情页控制 ====================
+    // ==================== 🚪 二级页面控制 ====================
     function openPackDetail(packId) {
         selectedPackId = packId;
         const pack = PACKS_CONFIG.find(p => p.id === packId);
@@ -607,13 +667,13 @@
         document.getElementById("detailOverlay").style.display = "none";
     }
 
-    // ==================== 🎲 爆率分配与直达仓库逻辑 ====================
+    // ==================== 🎲 抽卡核心算法 ====================
     function executeDrawCore(times) {
         const pack = PACKS_CONFIG.find(p => p.id === selectedPackId);
         const totalCost = pack.cost * times;
 
         if (gold < totalCost) {
-            alert("🪙 余额不足！可以前去【高级后台】充值，或者去【仓库】回收旧卡。");
+            alert("🪙 余额不足！请前去高级后台充值，或回收卡片。");
             return;
         }
 
@@ -636,13 +696,10 @@
             else if (roll < bR) rarity = "R";
 
             let filteredPool = pack.pool.filter(m => m.rarity === rarity);
-            if(filteredPool.length === 0) {
-                filteredPool = pack.pool; // 如果某一档没牌，从全部卡牌降级抽取
-            }
+            if(filteredPool.length === 0) filteredPool = pack.pool;
+            
             let rolled = filteredPool[Math.floor(Math.random() * filteredPool.length)];
-
             viewQueue.push(rolled);
-            // 抽出直接静默录入核心个人仓库
             warehouse.push({ ...rolled, sellPrice: RECOVER_PRICES[rolled.rarity] || 10 });
         }
 
@@ -685,18 +742,16 @@
         }, 120);
     }
 
-    // ==================== 🎒 个人大仓库渲染 ====================
+    // ==================== 🎒 个人大仓库 ====================
     function renderWarehouseView() {
         const container = document.getElementById("warehouseGridContainer");
         const keyword = document.getElementById("globalSearchInput").value.trim().toLowerCase();
         
         let displayList = warehouse;
-        if(keyword !== "") {
-            displayList = warehouse.filter(item => item.name.toLowerCase().includes(keyword));
-        }
+        if(keyword !== "") displayList = warehouse.filter(item => item.name.toLowerCase().includes(keyword));
 
         if (displayList.length === 0) {
-            container.innerHTML = `<div class="empty-tip">核心仓库内目前空空如也</div>`;
+            container.innerHTML = `<div class="empty-tip">仓库内目前空空如也</div>`;
             return;
         }
         
@@ -734,7 +789,7 @@
         alert(`💰 仓库清理成功，回笼资产 ${total} 金币！`);
     }
 
-    // ==================== 🛠️ 独立可视化管理后台逻辑层 ====================
+    // ==================== 🛠️ 可视化管理后台系统 ====================
     function buildAdminPackSelector() {
         const sel = document.getElementById("adminPackSelect");
         sel.innerHTML = "";
@@ -771,10 +826,10 @@
         pack.cost = parseInt(document.getElementById("adminPackCost").value) || 100;
 
         saveLocalStorageData();
-        renderPacksMarket(); // 同步刷新首页
-        buildAdminPackSelector(); // 重新加载列表
+        renderPacksMarket(); 
+        buildAdminPackSelector(); 
         document.getElementById("adminPackSelect").value = packId;
-        alert("✨ 该卡包基本属性/封面已完成热热更新，即时生效！");
+        alert("✨ 该卡包配置/封面已热更新完成，即时生效！");
     }
 
     function refreshAdminPoolPreview(pack) {
@@ -806,10 +861,9 @@
         saveLocalStorageData();
         refreshAdminPoolPreview(pack);
 
-        // 重置表单
         document.getElementById("newCardName").value = "";
         document.getElementById("newCardImage").value = "";
-        alert(`🎉 成功将新卡【${name}】注入到 ${pack.title} 的底层随机池中！`);
+        alert(`🎉 成功将新卡【${name}】注入到随机抽奖池中！`);
     }
 
     function saveGmGold() {
@@ -818,7 +872,7 @@
         alert("🎯 资产充值修改成功！");
     }
 
-    // ==================== 🔊 Web Audio 无源音效引擎 ====================
+    // ==================== 🔊 Web Audio 音效引擎 ====================
     function playSynthAudio(type) {
         try {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -853,7 +907,7 @@
         });
     }
 
-    // ==================== 🎆 Canvas 全屏炫彩重力喷射粒子特效 ====================
+    // ==================== 🎆 Canvas 喷射粒子特效 ====================
     let canvas, ctx, particles = [], fxAnimationId;
     function initCanvas() { canvas = document.getElementById("fxCanvas"); ctx = canvas.getContext("2d"); window.addEventListener("resize", resizeCanvas); resizeCanvas(); }
     function resizeCanvas() { if(canvas) { canvas.width = window.innerWidth; canvas.height = window.innerHeight; } }
