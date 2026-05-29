@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🌟 Power Go Premium 🌟</title>
+    <title>🌟 Power Go Premium 3.0 🌟</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         /* ==================== 👑 全局变量与手机端适配重构 👑 ==================== */
         :root {
@@ -28,21 +29,28 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-main);
             color: white;
-            padding-bottom: 70px; /* 为底部导航栏留空 */
+            padding-bottom: 75px; /* 为底部高质感导航留空 */
             overflow-x: hidden;
         }
 
-        /* 顶部通栏 */
+        /* 👑 智能流线型 Header (含搜索) */
         .header-bar {
             background: #161925;
             padding: 15px;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            gap: 12px;
             border-bottom: 1px solid #232838;
             position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 1000;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
         }
 
         .brand-title {
@@ -50,6 +58,7 @@
             font-weight: 900;
             color: var(--primary);
             text-shadow: 0 0 10px rgba(38,230,230,0.3);
+            letter-spacing: 1px;
         }
 
         .gold-badge {
@@ -64,6 +73,38 @@
             gap: 5px;
         }
 
+        /* 🔍 搜索框样式 */
+        .search-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .search-bar {
+            width: 100%;
+            background: #0b0d14;
+            border: 1px solid #2a2e45;
+            border-radius: 10px;
+            padding: 11px 12px 11px 38px;
+            color: white;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .search-bar:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 8px rgba(38,230,230,0.2);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            font-size: 14px;
+        }
+
         /* 主体内容视图区 */
         .view-section {
             display: none;
@@ -76,7 +117,19 @@
             display: block;
         }
 
-        /* ==================== 🎴 抽玩/卡包大厅样式 ==================== */
+        /* 概率公示板 */
+        .rate-board {
+            background: #161925;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 20px;
+            font-size: 12px;
+            line-height: 1.6;
+            color: #94a3b8;
+            border: 1px solid #232838;
+        }
+
+        /* ==================== 🎴 潮玩大厅样式 ==================== */
         .pack-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -101,13 +154,11 @@
 
         .pack-banner {
             width: 100%;
-            height: 160px;
+            height: 180px;
             object-fit: cover;
-            background: linear-gradient(45deg, #1e1b4b, #311042);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
+            background: #11131e;
+            cursor: pointer;
+            display: block;
         }
 
         .pack-info {
@@ -118,52 +169,102 @@
             font-size: 18px;
             font-weight: bold;
             margin-bottom: 5px;
+            color: #f1f5f9;
         }
 
-        .pack-price {
-            color: #ffd700;
-            font-weight: bold;
-            font-size: 15px;
-            margin-bottom: 12px;
+        .pack-tag {
+            font-size: 12px;
+            color: var(--primary);
+            font-weight: 500;
         }
 
-        .draw-btn-row {
+        /* ==================== 🚪 全屏二级卡包详情弹窗 ==================== */
+        #detailOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-main);
+            z-index: 2000;
+            display: none;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .detail-header {
+            padding: 15px 20px;
             display: flex;
-            gap: 8px;
+            align-items: center;
+            gap: 20px;
+            border-bottom: 1px solid #232838;
+            background: #161925;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
-        .draw-btn {
-            flex: 1;
-            padding: 10px;
+        .back-btn {
+            font-size: 22px;
+            cursor: pointer;
+            color: var(--primary);
+            padding: 5px;
+        }
+
+        .detail-content {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            max-width: 500px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .detail-banner-img {
+            width: 100%;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            border: 1px solid #2a2e45;
+        }
+
+        .detail-intro {
+            width: 100%;
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid #232838;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #94a3b8;
+        }
+
+        .detail-actions {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .action-big-btn {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
             border: none;
-            border-radius: 8px;
+            font-size: 16px;
             font-weight: bold;
             color: white;
             cursor: pointer;
-            font-size: 13px;
-        }
-        .btn-blue { background: linear-gradient(180deg, #0284c7, #0369a1); }
-        .btn-orange { background: linear-gradient(180deg, #f97316, #ea580c); }
-
-        /* 概率公示板 */
-        .rate-board {
-            background: #161925;
-            border-radius: 12px;
-            padding: 12px;
-            margin-bottom: 15px;
-            font-size: 12px;
-            line-height: 1.6;
-            color: #94a3b8;
-            border: 1px solid #232838;
-        }
-
-        /* 本轮清单流水线 */
-        .flow-container {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 15px;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
         }
+        .btn-single { background: linear-gradient(180deg, #0284c7, #0369a1); }
+        .btn-ten { background: linear-gradient(180deg, #f97316, #ea580c); }
 
         /* ==================== 🎒 核心智能仓库样式 ==================== */
         .warehouse-header {
@@ -240,7 +341,6 @@
             font-weight: bold;
             cursor: pointer;
         }
-        .cell-action-btn:hover { background: #475569; }
 
         /* 稀有度专属璀璨边框类 */
         .border-N { border-color: var(--color-n); }
@@ -251,16 +351,16 @@
 
         @keyframes pulseUR {
             0% { transform: scale(1); }
-            100% { transform: scale(1.01); filter: brightness(1.1); }
+            100% { transform: scale(1.02); filter: brightness(1.1); }
         }
 
-        /* ==================== 📱 底部大厂App极简黑胶导航栏 ==================== */
+        /* ==================== 📱 底部大厂App极简胶底导航栏 ==================== */
         .bottom-nav {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 60px;
+            height: 65px;
             background: #11131e;
             border-top: 1px solid #222638;
             display: flex;
@@ -278,9 +378,9 @@
             font-size: 11px;
             font-weight: bold;
             cursor: pointer;
-            text-decoration: none;
             flex: 1;
             padding: 8px 0;
+            gap: 4px;
         }
 
         .nav-item.active {
@@ -288,11 +388,10 @@
         }
 
         .nav-icon {
-            font-size: 20px;
-            margin-bottom: 3px;
+            font-size: 18px;
         }
 
-        /* ==================== 🎆 粒子特效全屏喷射大层 ==================== */
+        /* ==================== 🎆 特效动画全屏展现层 ==================== */
         #fxCanvas {
             position: fixed;
             top: 0; left: 0;
@@ -302,7 +401,6 @@
             display: none;
         }
 
-        /* 全屏抽卡高透弹窗 */
         #showcardOverlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -319,7 +417,7 @@
             width: 85vw;
             max-width: 300px;
             height: 120vw;
-            max-height: 430px;
+            max-height: 420px;
             background: #191c2b;
             border-radius: 18px;
             padding: 15px;
@@ -350,11 +448,8 @@
             box-shadow: 0 4px 15px rgba(34,197,94,0.4);
         }
 
-        /* 隐藏的GM面板 */
-        .gm-panel-sec { background: #161925; padding: 15px; border-radius: 12px; margin-top: 20px; border: 1px dashed var(--color-sr); }
-        .empty-tip { color: #475569; text-align: center; font-style: italic; padding: 30px; width: 100%; }
+        .empty-tip { color: #475569; text-align: center; font-style: italic; padding: 40px; width: 100%; }
         
-        /* 手机端全屏震动 */
         .shake-body { animation: bodyShake 0.3s cubic-bezier(.36,.07,.19,.97) both; }
         @keyframes bodyShake {
             10%, 90% { transform: translate3d(-1px, 0, 0); }
@@ -362,28 +457,32 @@
             30%, 50%, 70% { transform: translate3d(-3px, 0, 0); }
             40%, 60% { transform: translate3d(3px, 0, 0); }
         }
+
+        /* GM 调配 */
+        .gm-panel-sec { background: #161925; padding: 15px; border-radius: 12px; border: 1px dashed var(--color-sr); margin-top: 15px;}
     </style>
 </head>
 <body>
 
     <div class="header-bar">
-        <div class="brand-title">POWER GO</div>
-        <div class="gold-badge">🪙 <span id="goldVal">5000</span></div>
+        <div class="header-top">
+            <div class="brand-title">POWER GO</div>
+            <div class="gold-badge">🪙 <span id="goldVal">5000</span></div>
+        </div>
+        <div class="search-container">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="text" id="globalSearchInput" class="search-bar" placeholder="搜索商品、卡包名称..." oninput="triggerSearchFilter()">
+        </div>
     </div>
 
     <div id="view-home" class="view-section active">
         <div class="rate-board">
-            📌 <strong>全局官方爆率宏控调配公示：</strong><br>
-            N级: 80% | R级: 12% | SR级: 5% | SSR级: 2.8% | UR级: 0.2%
+            📌 <strong>全局调配官方爆率：</strong><br>
+            N: 80% | R: 12% | SR: 5% | SSR: 2.8% | UR: 0.2%
         </div>
         
         <h2>🔥 热门推荐卡包</h2>
         <div id="packGridContainer" class="pack-grid"></div>
-
-        <h3 style="margin-top:25px; color:#94a3b8;">📋 本轮欧气开出清单</h3>
-        <div id="flowResultGrid" class="pack-grid" style="margin-top:10px;">
-            <div class="empty-tip">暂无抽卡流流水纪录</div>
-        </div>
     </div>
 
     <div id="view-bag" class="view-section">
@@ -391,52 +490,70 @@
             <h2>🎒 我的核心个人仓库</h2>
             <button class="clear-btn" onclick="sellAllWarehouse()">一键清空回收</button>
         </div>
-        <div id="warehouseGridContainer" class="warehouse-grid">
-            <div class="empty-tip">仓库空空如也，快去大厅抽卡！</div>
-        </div>
+        <div id="warehouseGridContainer" class="warehouse-grid"></div>
     </div>
 
     <div id="view-gm" class="view-section">
-        <h2>🛠️ GM 级高级内核调配室</h2>
+        <h2>🛠️ 内核高级调配中心</h2>
         <div class="gm-panel-sec">
             <p style="color:#a855f7; margin-bottom:10px; font-weight:bold;">🪙 快捷篡改核心资产账户</p>
             <input type="number" id="gmGoldIn" style="background:#000; border:1px solid #444; color:#26e6e6; padding:8px; border-radius:6px; width:120px; font-weight:bold; font-size:16px;">
             <button onclick="saveGmGold()" style="background:var(--color-sr); color:#fff; border:none; padding:8px 15px; border-radius:6px; font-weight:bold; margin-left:10px;">瞬时注资</button>
         </div>
-        <p style="font-size:11px; color:#475569; text-align:center; margin-top:20px;">Power Go Engine v2.5 移动端适配大厂架构</p>
+    </div>
+
+    <div id="detailOverlay">
+        <div class="detail-header">
+            <div class="back-btn" onclick="closePackDetail()"><i class="fa-solid fa-chevron-left"></i></div>
+            <h2 id="detailTitle">卡包详情</h2>
+        </div>
+        <div class="detail-content">
+            <img id="detailBanner" class="detail-banner-img" src="" alt="Pack Cover">
+            <div class="detail-intro">
+                欢迎来到该系列盲盒限定池，本包严密遵循系统设定的原生粒子爆率。抽中后卡片将直接静默送入您的【仓库】中。
+            </div>
+            <div class="detail-actions">
+                <button class="action-big-btn btn-single" id="draw1Btn">
+                    <i class="fa-solid fa-cube"></i> 单次开启 (🪙 <span id="singleCost"></span>)
+                </button>
+                <button class="action-big-btn btn-ten" id="draw10Btn">
+                    <i class="fa-solid fa-cubes"></i> 尊享十连 (🪙 <span id="tenCost"></span>)
+                </button>
+            </div>
+        </div>
     </div>
 
     <div class="bottom-nav">
         <div class="nav-item active" onclick="switchTab('home', this)">
-            <div class="nav-icon">⚡</div>
+            <i class="fa-solid fa-bolt nav-icon"></i>
             <div>潮玩</div>
         </div>
         <div class="nav-item" onclick="switchTab('bag', this)">
-            <div class="nav-icon">🎒</div>
+            <i class="fa-solid fa-box-archive nav-icon"></i>
             <div>仓库</div>
         </div>
         <div class="nav-item" onclick="switchTab('gm', this)">
-            <div class="nav-icon">⚙️</div>
+            <i class="fa-solid fa-sliders nav-icon"></i>
             <div>高级配置</div>
         </div>
     </div>
 
     <canvas id="fxCanvas"></canvas>
-
     <div id="showcardOverlay">
         <div id="giantCard" class="giant-card"></div>
         <button id="nextCardBtn" class="next-btn" onclick="triggerNextQueuedCard()">下一张 ➡️</button>
     </div>
 
 <script>
-    // ==================== 📦 卡包多数据源矩阵重构 ====================
+    // ==================== 📦 卡包多数据源配置矩阵 ====================
+    // 💡 教学：看这里！你想换封面，只需要把下面 `banner` 后面的图片链接改成你喜欢的精美海报图即可！
     const PACKS_CONFIG = [
         {
             id: "pack_01",
-            title: "精灵觉醒系列 (第一弹)",
-            emoji: "🐲",
+            title: "宝可梦觉醒系列 ",
+            tag: "🔥 经典大作 • 绝版复刻",
+            banner: "https://asia.pokemon-card.com/tw/wp-content/uploads/sites/2/2025/11/tw_M2a_pkg.png", // <--- 随时可以更换成任何大图
             cost: 100,
-            // 包含原本完整的30只精灵池
             pool: [
                 { name: "妙蛙种子", rarity: "N", image: "https://asia.pokemon-card.com/tw/card-img/tw00013958.png" },
                 { name: "小火龙", rarity: "N", image: "https://asia.pokemon-card.com/tw/card-img/tw00014329.png" },
@@ -470,37 +587,35 @@
                 { name: "金色·骑拉帝纳 VSTAR", rarity: "UR", image: "https://asia.pokemon-card.com/hk/card-img/hk00008066.png" }
             ]
         }
-        // 💡 提示：后续需要加第二个、第三个卡包时，只需要在大括号后面加逗号，然后粘贴全新数组即可扩展！
+        // 💡 以后如果想加第二个包，直接在大括号后面打一个逗号，复制整段填入新数据即可！
     ];
 
-    // 固定爆率分配结构
+    // 精准爆率矩阵分配
     const RATES = { "UR": 0.2, "SSR": 2.8, "SR": 5.0, "R": 12.0, "N": 80.0 };
-    const RECOVER_PRICES = { "N": 10, "R": 80, "SR": 800, "SSR": 3500, "UR": 9999 };
+    const RECOVER_PRICES = { "N": 10, "R": 50, "SR": 200, "SSR": 800, "UR": 3000 };
 
-    // 核心引擎状态追踪
-    let gold = localStorage.getItem("pg_gold") !== null ? parseInt(localStorage.getItem("pg_gold")) : 5000;
-    let warehouse = localStorage.getItem("pg_inventory") !== null ? JSON.parse(localStorage.getItem("pg_inventory")) : [];
-    let currentDrawResults = [];
+    let gold = localStorage.getItem("pg_gold_3") !== null ? parseInt(localStorage.getItem("pg_gold_3")) : 5000;
+    let warehouse = localStorage.getItem("pg_warehouse_3") !== null ? JSON.parse(localStorage.getItem("pg_warehouse_3")) : [];
+    
     let viewQueue = [];
     let queueIdx = 0;
-
-    // Audio合成器单例缓存
+    let selectedPackId = null;
     let audioCtx = null;
 
     window.onload = function() {
         initCanvas();
         updateGoldDisplay();
-        renderPacksMarket();
+        renderPacksMarket(PACKS_CONFIG);
         renderWarehouseView();
         document.getElementById("gmGoldIn").value = gold;
     };
 
     function updateGoldDisplay() {
         document.getElementById("goldVal").innerText = gold;
-        localStorage.setItem("pg_gold", gold);
+        localStorage.setItem("pg_gold_3", gold);
     }
 
-    // ==================== 📱 仿原生App单页切签架构 ====================
+    // ==================== 📱 单页架构页签切换 ====================
     function switchTab(targetId, el) {
         document.querySelectorAll(".view-section").forEach(sec => sec.classList.remove("active"));
         document.querySelectorAll(".nav-item").forEach(item => item.classList.remove("active"));
@@ -510,45 +625,78 @@
         window.scrollTo(0,0);
     }
 
-    // 绘制大厅里的卡包
-    function renderPacksMarket() {
+    // ==================== 🔍 实时全局智能搜索过滤 ====================
+    function triggerSearchFilter() {
+        const keyword = document.getElementById("globalSearchInput").value.trim().toLowerCase();
+        
+        // 过滤卡包
+        const filteredPacks = PACKS_CONFIG.filter(p => p.title.toLowerCase().includes(keyword));
+        renderPacksMarket(filteredPacks);
+
+        // 如果在仓库页，同步过滤仓库内部拥有商品
+        renderWarehouseView(keyword);
+    }
+
+    // 渲染首页卡包列表
+    function renderPacksMarket(packsArray) {
         const grid = document.getElementById("packGridContainer");
         grid.innerHTML = "";
-        PACKS_CONFIG.forEach(pack => {
+        if(packsArray.length === 0) {
+            grid.innerHTML = `<div class="empty-tip">未搜索到相关联的卡包系列</div>`;
+            return;
+        }
+        packsArray.forEach(pack => {
             const card = document.createElement("div");
             card.className = "pack-card";
             card.innerHTML = `
-                <div class="pack-banner">${pack.emoji}</div>
+                <img class="pack-banner" src="${pack.banner}" onclick="openPackDetail('${pack.id}')">
                 <div class="pack-info">
                     <div class="pack-name">${pack.title}</div>
-                    <div class="pack-price">🪙 ${pack.cost} 金币 / 单抽</div>
-                    <div class="draw-btn-row">
-                        <button class="draw-btn btn-blue" onclick="executeDrawCore('${pack.id}', 1)">单抽</button>
-                        <button class="draw-btn btn-orange" onclick="executeDrawCore('${pack.id}', 10)">十连抽</button>
-                    </div>
+                    <div class="pack-tag">${pack.tag}</div>
                 </div>
             `;
             grid.appendChild(card);
         });
     }
 
-    // ==================== 🎲 大厂高拟真高级抽卡算法内核 ====================
-    function executeDrawCore(packId, times) {
-        const targetPack = PACKS_CONFIG.find(p => p.id === packId);
-        const totalCost = targetPack.cost * times;
+    // ==================== 🚪 二级页面：打开/关闭卡包详情 ====================
+    function openPackDetail(packId) {
+        selectedPackId = packId;
+        const pack = PACKS_CONFIG.find(p => p.id === packId);
+        if(!pack) return;
+
+        document.getElementById("detailTitle").innerText = pack.title;
+        document.getElementById("detailBanner").src = pack.banner;
+        document.getElementById("singleCost").innerText = pack.cost;
+        document.getElementById("tenCost").innerText = pack.cost * 10;
+
+        // 动态绑定抽卡方法
+        document.getElementById("draw1Btn").onclick = function() { executeDrawCore(1); };
+        document.getElementById("draw10Btn").onclick = function() { executeDrawCore(10); };
+
+        document.getElementById("detailOverlay").style.display = "flex";
+    }
+
+    function closePackDetail() {
+        document.getElementById("detailOverlay").style.display = "none";
+    }
+
+    // ==================== 🎲 抽卡核心算法体系 ====================
+    function executeDrawCore(times) {
+        const pack = PACKS_CONFIG.find(p => p.id === selectedPackId);
+        const totalCost = pack.cost * times;
 
         if (gold < totalCost) {
-            alert("🪙 资产储备不足！请先去个人仓库回收旧卡换取注资。");
+            alert("🪙 余额不足，无法开启卡包！可以去仓库回收多余的卡。");
             return;
         }
 
         gold -= totalCost;
         updateGoldDisplay();
 
-        currentDrawResults = [];
         viewQueue = [];
 
-        // 边界断点精确计算
+        // 爆率界限分层计算
         let bUR = RATES["UR"];
         let bSSR = bUR + RATES["SSR"];
         let bSR = bSSR + RATES["SR"];
@@ -563,15 +711,15 @@
             else if (roll < bSR) rarity = "SR";
             else if (roll < bR) rarity = "R";
 
-            let filteredPool = targetPack.pool.filter(m => m.rarity === rarity);
-            // 如果某包中没有配对级别的卡牌，自动降级安全保护
+            let filteredPool = pack.pool.filter(m => m.rarity === rarity);
             if(filteredPool.length === 0) {
-                filteredPool = targetPack.pool.filter(m => m.rarity === "N");
+                filteredPool = pack.pool.filter(m => m.rarity === "N");
             }
             let rolled = filteredPool[Math.floor(Math.random() * filteredPool.length)];
 
-            currentDrawResults.push(rolled);
             viewQueue.push(rolled);
+            
+            // 【重要更改】抽中卡片直接静默压入仓库，首页绝不展示任何残留清单
             warehouse.push({ ...rolled, sellPrice: RECOVER_PRICES[rolled.rarity] });
         }
 
@@ -580,7 +728,7 @@
         triggerNextQueuedCard();
     }
 
-    // 弹窗轮播展台
+    // 抽卡结果弹窗循环轮播展示
     function triggerNextQueuedCard() {
         const giantCard = document.getElementById("giantCard");
         const overlay = document.getElementById("showcardOverlay");
@@ -589,16 +737,15 @@
 
         if (queueIdx >= viewQueue.length) {
             overlay.style.display = "none";
-            flushFlowResultsGrid();
-            renderWarehouseView();
-            localStorage.setItem("pg_inventory", JSON.stringify(warehouse));
+            renderWarehouseView(); // 刷新仓库显示
+            localStorage.setItem("pg_warehouse_3", JSON.stringify(warehouse));
             return;
         }
 
         const currentCard = viewQueue[queueIdx];
         const btn = document.getElementById("nextCardBtn");
 
-        btn.innerText = queueIdx === viewQueue.length - 1 ? "收入核心仓库 🎒" : `下一张 (${queueIdx + 1}/${viewQueue.length}) ➡️`;
+        btn.innerText = queueIdx === viewQueue.length - 1 ? "全部收入仓库 🎒" : `下一张 (${queueIdx + 1}/${viewQueue.length}) ➡️`;
 
         setTimeout(() => {
             giantCard.className = `giant-card border-${currentCard.rarity}`;
@@ -617,37 +764,28 @@
             giantCard.classList.add("pop-up");
             queueIdx++;
 
-            // 触发全新重构的声光喷射特效体系
+            // 激发生光喷射动画
             igniteFXSystem(currentCard.rarity);
 
         }, 120);
     }
 
-    // 本轮流水渲染
-    function flushFlowResultsGrid() {
-        const grid = document.getElementById("flowResultGrid");
-        grid.innerHTML = "";
-        currentDrawResults.forEach(m => {
-            const node = document.createElement("div");
-            node.className = `bag-item border-${m.rarity}`;
-            node.innerHTML = `
-                <img class="bag-item-img" src="${m.image}">
-                <div class="bag-item-name">${m.name}</div>
-                <div class="bag-item-rarity" style="color:var(--color-${m.rarity.toLowerCase()})">${m.rarity}</div>
-            `;
-            grid.appendChild(node);
-        });
-    }
-
-    // ==================== 🎒 核心个人仓库系统逻辑 ====================
-    function renderWarehouseView() {
+    // ==================== 🎒 核心个人仓库系统 ====================
+    function renderWarehouseView(filterKeyword = "") {
         const container = document.getElementById("warehouseGridContainer");
-        if (warehouse.length === 0) {
-            container.innerHTML = `<div class="empty-tip">仓库空空如也，快去大厅抽卡！</div>`;
+        
+        let displayList = warehouse;
+        if(filterKeyword !== "") {
+            displayList = warehouse.filter(item => item.name.toLowerCase().includes(filterKeyword));
+        }
+
+        if (displayList.length === 0) {
+            container.innerHTML = `<div class="empty-tip">仓库内无匹配商品</div>`;
             return;
         }
+        
         container.innerHTML = "";
-        warehouse.forEach((m, idx) => {
+        displayList.forEach((m, idx) => {
             const node = document.createElement("div");
             node.className = `bag-item border-${m.rarity}`;
             node.innerHTML = `
@@ -664,8 +802,8 @@
         gold += warehouse[index].sellPrice;
         warehouse.splice(index, 1);
         updateGoldDisplay();
-        renderWarehouseView();
-        localStorage.setItem("pg_inventory", JSON.stringify(warehouse));
+        renderWarehouseView(document.getElementById("globalSearchInput").value.trim().toLowerCase());
+        localStorage.setItem("pg_warehouse_3", JSON.stringify(warehouse));
     }
 
     function sellAllWarehouse() {
@@ -676,17 +814,17 @@
         warehouse = [];
         updateGoldDisplay();
         renderWarehouseView();
-        localStorage.setItem("pg_inventory", JSON.stringify(warehouse));
-        alert(`💰 一键清算回收成功！已成功回笼变现资金 ${total} 金币！`);
+        localStorage.setItem("pg_warehouse_3", JSON.stringify(warehouse));
+        alert(`💰 仓库内所有卡片已全部高价变现，回笼资金 ${total} 金币！`);
     }
 
     function saveGmGold() {
         gold = parseInt(document.getElementById("gmGoldIn").value) || 0;
         updateGoldDisplay();
-        alert("🎯 GM数据包已瞬间完成物理覆盖修正！");
+        alert("🎯 金币资产调整完成！");
     }
 
-    // ==================== 🔊 Web Audio API 无声源超拟真合成乐系统 ====================
+    // ==================== 🔊 极高还原度：Web Audio 无媒体无源音效合成器 ====================
     function playSynthAudio(type) {
         try {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -695,31 +833,27 @@
             const now = audioCtx.currentTime;
             
             if (type === 'N' || type === 'R') {
-                // 普通卡：清脆机械音
                 let osc = audioCtx.createOscillator();
                 let gain = audioCtx.createGain();
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(587.33, now); // D5
+                osc.frequency.setValueAtTime(587.33, now); 
                 osc.frequency.exponentialRampToValueAtTime(880, now + 0.1);
-                gain.gain.setValueAtTime(0.1, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                gain.gain.setValueAtTime(0.08, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
                 osc.connect(gain); gain.connect(audioCtx.destination);
-                osc.start(now); osc.stop(now + 0.15);
+                osc.start(now); osc.stop(now + 0.12);
             } 
             else if (type === 'SR') {
-                // 紫光高亢和弦
-                triggerChord([440, 554.37, 659.25], 0.3, 'triangle');
+                triggerChord([440, 554.37, 659.25], 0.35, 'triangle');
             } 
             else if (type === 'SSR') {
-                // 金光闪耀史诗级上升音
-                triggerChord([523.25, 659.25, 783.99, 1046.50], 0.5, 'sawtooth');
+                triggerChord([523.25, 659.25, 783.99, 1046.50], 0.6, 'sawtooth');
             } 
             else if (type === 'UR') {
-                // UR 黑暗深邃神话级多频交响乐
-                triggerChord([220, 329.63, 392, 440, 554.37], 0.8, 'sawtooth');
-                setTimeout(() => triggerChord([440, 554.37, 659.25, 880], 1.2, 'sine'), 200);
+                triggerChord([220, 329.63, 392, 440, 554.37], 0.7, 'sawtooth');
+                setTimeout(() => triggerChord([440, 554.37, 659.25, 880], 1.0, 'sine'), 180);
             }
-        } catch (e) { console.log("音频引擎初始化延迟中", e); }
+        } catch (e) { console.log(e); }
     }
 
     function triggerChord(freqs, duration, waveType) {
@@ -729,14 +863,14 @@
             let gain = audioCtx.createGain();
             osc.type = waveType;
             osc.frequency.setValueAtTime(f, now);
-            gain.gain.setValueAtTime(0.06, now);
+            gain.gain.setValueAtTime(0.05, now);
             gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
             osc.connect(gain); gain.connect(audioCtx.destination);
             osc.start(now); osc.stop(now + duration);
         });
     }
 
-    // ==================== 🎆 Canvas 全屏流体喷射粒子引擎 ====================
+    // ==================== 🎆 极高还原度：Canvas 全屏炫彩粒子重力喷射引擎 ====================
     let canvas, ctx;
     let particles = [];
     let fxAnimationId;
@@ -749,18 +883,13 @@
     }
 
     function resizeCanvas() {
-        if(canvas) {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
+        if(canvas) { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
     }
 
     function igniteFXSystem(rarity) {
-        // 先停掉上一轮
         cancelAnimationFrame(fxAnimationId);
         particles = [];
         
-        // 触发音效
         playSynthAudio(rarity);
 
         if (rarity === "N" || rarity === "R") {
@@ -768,42 +897,39 @@
             return;
         }
 
-        // 手机物理震动体感模拟
+        // 震动处理
         document.body.classList.remove("shake-body");
         if(rarity === "UR") {
             setTimeout(() => document.body.classList.add("shake-body"), 5);
-            setTimeout(() => document.body.classList.remove("shake-body"), 400);
+            setTimeout(() => document.body.classList.remove("shake-body"), 350);
         }
 
         document.getElementById("fxCanvas").style.display = "block";
         
         let colors = [];
-        // 根据稀有度设定粒子颜色池
-        if(rarity === "SR") colors = ["#c084fc", "#a855f7", "#e9d5ff", "#ffffff"]; // 紫光
-        if(rarity === "SSR") colors = ["#fbbf24", "#f59e0b", "#fef08a", "#ffffff"]; // 金光
-        if(rarity === "UR") colors = ["#ef4444", "#dc2626", "#7f1d1d", "#000000"]; // 寂灭高级红黑光
+        if(rarity === "SR") colors = ["#c084fc", "#a855f7", "#e9d5ff", "#ffffff"]; 
+        if(rarity === "SSR") colors = ["#fbbf24", "#f59e0b", "#fef08a", "#ffffff"]; 
+        if(rarity === "UR") colors = ["#ef4444", "#dc2626", "#991b1b", "#1e293b"]; // 喷射暗黑高级感寂灭红
 
         const spawnX = window.innerWidth / 2;
-        const spawnY = window.innerHeight * 0.45; // 从卡牌中心喷射
+        const spawnY = window.innerHeight * 0.45; 
 
-        // 喷射粒子生成数
-        let particleCount = rarity === "UR" ? 180 : (rarity === "SSR" ? 120 : 60);
+        let particleCount = rarity === "UR" ? 160 : (rarity === "SSR" ? 100 : 55);
 
         for(let i=0; i<particleCount; i++) {
             let angle = Math.random() * Math.PI * 2;
-            let speed = Math.random() * 8 + (rarity === "UR" ? 6 : 4);
+            let speed = Math.random() * 7 + (rarity === "UR" ? 7 : 4);
             particles.push({
                 x: spawnX,
                 y: spawnY,
                 vx: Math.cos(angle) * speed,
-                vy: Math.sin(angle) * speed - 2, // 略微向上带一点喷射力
+                vy: Math.sin(angle) * speed - 1.5, 
                 radius: Math.random() * 4 + 2,
                 color: colors[Math.floor(Math.random() * colors.length)],
                 alpha: 1,
                 decay: Math.random() * 0.02 + 0.015
             });
         }
-
         runFXLoop();
     }
 
@@ -814,7 +940,7 @@
         particles.forEach(p => {
             p.x += p.vx;
             p.y += p.vy;
-            p.vy += 0.1; // 重力加速度
+            p.vy += 0.12; // 重力加速度
             p.alpha -= p.decay;
 
             if(p.alpha > 0) {
@@ -824,8 +950,7 @@
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
                 ctx.fillStyle = p.color;
-                // 为高级卡加入光晕阴影
-                ctx.shadowBlur = 10;
+                ctx.shadowBlur = 8;
                 ctx.shadowColor = p.color;
                 ctx.fill();
                 ctx.restore();
