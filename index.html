@@ -6,6 +6,39 @@
     <title>萌宠抽卡乐园 - SSR超级特效版</title>
 
     <style>
+   /* ==================== 👑 纯视觉大厂高档特效 👑 ==================== */
+/* SSR卡牌的璀璨金光 */
+.card-SSR {
+    border: 3px solid #fbbf24 !important;
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.6) !important;
+}
+
+/* UR卡牌专属：终极神话金色流光 */
+.card-UR {
+    border: 3px solid #eab308 !important;
+    box-shadow: 0 0 25px rgba(234, 179, 8, 0.9), inset 0 0 15px rgba(234, 179, 8, 0.5) !important;
+    animation: urGlow 1.5s infinite alternate ease-in-out !important;
+}
+
+@keyframes urGlow {
+    0% { transform: scale(1); filter: brightness(1) drop-shadow(0 0 5px #eab308); }
+    100% { transform: scale(1.02); filter: brightness(1.25) drop-shadow(0 0 15px #eab308); }
+}
+
+/* 屏幕震动特效：抽中神话时的物理震撼 */
+.screen-shake {
+    animation: shakeEffect 0.4s cubic-bezier(.36,.07,.19,.97) both !important;
+}
+
+@keyframes shakeEffect {
+    10%, 90% { transform: translate3d(-2px, 0, 0); }
+    20%, 80% { transform: translate3d(4px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+    40%, 60% { transform: translate3d(6px, 0, 0); }
+}
+/* ================================================================ */
+        
+        
         * {
             margin: 0;
             padding: 0;
@@ -432,13 +465,13 @@
 
 <div id="adminModal" class="admin-panel-mask">
     <div class="admin-box">
-        <h3>🛠️ 核心数据修改面板</h3>
-        <div class="admin-form-group"><label>修改当前总金币：</label><input type="number" id="input-gold" /></div>
-        <div class="admin-form-group"><label>N级（普通）售价：</label><input type="number" id="input-price-N" /></div>
-        <div class="admin-form-group"><label>R级（稀有）售价：</label><input type="number" id="input-price-R" /></div>
-        <div class="admin-form-group"><label>SR级（超稀有）售价：</label><input type="number" id="input-price-SR" /></div>
-        <div class="admin-form-group"><label>SSR级（传说）售价：</label><input type="number" id="input-price-SSR" /></div>
-        <div class="admin-btn-group">
+       <h3>⚙️ 核心数据修改面板</h3>
+<div class="admin-form-group"><label>修改当前总金币：</label><input type="number" id="input-gold" /></div>
+<div class="admin-form-group"><label>N级（普通）售价：</label><input type="number" id="input-price-N" /></div>
+<div class="admin-form-group"><label>R级（稀有）售价：</label><input type="number" id="input-price-R" /></div>
+<div class="admin-form-group"><label>SR级（超稀有）售价：</label><input type="number" id="input-price-SR" /></div>
+<div class="admin-form-group"><label>SSR级（传说）售价：</label><input type="number" id="input-price-SSR" /></div>
+<div class="admin-form-group"><label style="color:#eab308; font-weight:bold;">UR级（神话）售价：</label><input type="number" id="input-price-UR" /></div>
             <button class="admin-btn admin-save" onclick="saveAdminData()">保存修改</button>
             <button class="admin-btn admin-close" onclick="closeAdmin()">关闭</button>
         </div>
@@ -449,18 +482,51 @@
     const ADMIN_PASSWORD = "123456";
 
     let gold = localStorage.getItem("pg_gold") !== null ? parseInt(localStorage.getItem("pg_gold")) : 5000;
-    let prices = localStorage.getItem("pg_prices") !== null ? JSON.parse(localStorage.getItem("pg_prices")) : {
-        "N": 10, "R": 80, "SR": 800, "SSR": 3500
-    };
-    let inventory = localStorage.getItem("pg_inventory") !== null ? JSON.parse(localStorage.getItem("pg_inventory")) : [];
+   let prices = localStorage.getItem("pg_prices") !== null ? JSON.parse(localStorage.getItem("pg_prices")) : {
+    "N": 10, "R": 80, "SR": 800, "SSR": 3500, "UR": 9999
+};
 
-    const monsters = [
-        { name: "妙蛙种子", rarity: "N", image: "https://asia.pokemon-card.com/hk/card-img/hk00008867.png" },
-        { name: "比比鸟", rarity: "N", image: "https://asia.pokemon-card.com/hk/card-img/hk00003243.png" },
-        { name: "大针蜂", rarity: "R", image: "https://asia.pokemon-card.com/tw/card-img/tw00018423.png" },
-        { name: "喷火龙", rarity: "SR", image: "https://q7.itc.cn/images01/20241028/5ebb6de3597743ef9dda4adb8a27406b.png" },
-        { name: "皮卡丘", rarity: "SSR", image: "https://asia.pokemon-card.com/tw/card-img/tw00018367.png" }
-    ];
+const monsters = [
+    // ================= 【N 级别：普通基础】(9种) =================
+    { name: "妙蛙种子", rarity: "N", image: "https://asia.pokemon-card.com/hk/card-img/hk00008867.png" },
+    { name: "小火龙", rarity: "N", image: "https://asia.pokemon-card.com/hk/card-img/hk00004944.png" },
+    { name: "杰尼龟", rarity: "N", image: "https://asia.pokemon-card.com/hk/card-img/hk00004953.png" },
+    { name: "绿毛虫", rarity: "N", image: "https://asia.pokemon-card.com/hk/card-img/hk00008064.png" },
+    { name: "波波", rarity: "N", image: "https://asia.pokemon-card.com/hk/card-img/hk00008272.png" },
+    { name: "可达鸭", rarity: "N", image: "https://asia.pokemon-card.com/hk/card-img/hk00006323.png" },
+    { name: "呆呆兽", rarity: "N", image: "https://asia.pokemon-card.com/hk/card-img/hk00003010.png" },
+    { name: "小磁怪", rarity: "N", image: "https://asia.pokemon-card.com/hk/card-img/hk00006361.png" },
+    { name: "地鼠", rarity: "N", image: "https://asia.pokemon-card.com/hk/card-img/hk00003039.png" },
+
+    // ================= 【R 级别：稀有闪卡】(8种) =================
+    { name: "比雕 (大比鸟)", rarity: "R", image: "https://asia.pokemon-card.com/hk/card-img/hk00003243.png" },
+    { name: "大针蜂", rarity: "R", image: "https://asia.pokemon-card.com/tw/card-img/tw00018423.png" },
+    { name: "胖丁", rarity: "R", image: "https://asia.pokemon-card.com/hk/card-img/hk00003028.png" },
+    { name: "九尾", rarity: "R", image: "https://asia.pokemon-card.com/hk/card-img/hk00004948.png" },
+    { name: "风速狗", rarity: "R", image: "https://asia.pokemon-card.com/hk/card-img/hk00003213.png" },
+    { name: "耿鬼", rarity: "R", image: "https://asia.pokemon-card.com/hk/card-img/hk00003222.png" },
+    { name: "暴鲤龙", rarity: "R", image: "https://asia.pokemon-card.com/hk/card-img/hk00004961.png" },
+    { name: "卡比兽", rarity: "R", image: "https://asia.pokemon-card.com/hk/card-img/hk00006450.png" },
+
+    // ================= 【SR 级别：超级稀有/强力进化】(6种) =================
+    { name: "快龙 ex", rarity: "SR", image: "https://asia.pokemon-card.com/hk/card-img/hk00007886.png" },
+    { name: "巨金怪 ex", rarity: "SR", image: "https://asia.pokemon-card.com/hk/card-img/hk00007890.png" },
+    { name: "轰鸣月 ex", rarity: "SR", image: "https://asia.pokemon-card.com/hk/card-img/hk00007662.png" },
+    { name: "铁武者 ex", rarity: "SR", image: "https://asia.pokemon-card.com/hk/card-img/hk00007641.png" },
+    { name: "班基拉斯 ex", rarity: "SR", image: "https://asia.pokemon-card.com/hk/card-img/hk00007135.png" },
+    { name: "索罗亚克", rarity: "SR", image: "https://asia.pokemon-card.com/hk/card-img/hk00004245.png" },
+
+    // ================= 【SSR 级别：传说特写/爆率狂欢】(5种) =================
+    { name: "喷火龙 ex", rarity: "SSR", image: "https://q7.itc.cn/images01/20241028/5ebb6de3597743ef9dda4adb8a27406b.png" },
+    { name: "皮卡丘 ex", rarity: "SSR", image: "https://asia.pokemon-card.com/tw/card-img/tw00018367.png" },
+    { name: "甲贺忍蛙 ex", rarity: "SSR", image: "https://asia.pokemon-card.com/hk/card-img/hk00008518.png" },
+    { name: "超梦 ex", rarity: "SSR", image: "https://asia.pokemon-card.com/hk/card-img/hk00008119.png" },
+    { name: "烈空坐", rarity: "SSR", image: "https://asia.pokemon-card.com/hk/card-img/hk00004381.png" },
+
+    // ================= 【UR 级别：金色终极神话】(2种) =================
+    { name: "金色·阿尔宙斯 VSTAR", rarity: "UR", image: "https://asia.pokemon-card.com/tw/card-img/tw00004724.png" },
+    { name: "金色·骑拉帝纳 VSTAR", rarity: "UR", image: "https://asia.pokemon-card.com/tw/card-img/tw00006201.png" }
+];
 
     let pendingDrawCount = 0;
     let cardQueue = []; 
@@ -480,19 +546,20 @@
         document.getElementById("label-SSR").innerText = prices["SSR"];
     }
 
-    function getRandomMonster() {
-        const rand = Math.random() * 100;
-        let rarity = "N";
-        if (rand < 86) rarity = "N";
-        else if (rand < 96) rarity = "R";
-        else if (rand < 98.8) rarity = "SR";
-        else rarity = "SSR";
+   function getRandomMonster() {
+    const rand = Math.random() * 100;
+    let rarity = "N";
+    
+    if (rand < 75) rarity = "N";          // 75% 爆率
+    else if (rand < 90) rarity = "R";     // 15% 爆率
+    else if (rand < 97) rarity = "SR";    // 7% 爆率
+    else if (rand < 99.7) rarity = "SSR"; // 2.7% 爆率（触发全屏金色炸裂特效！）
+    else rarity = "UR";                  // 0.3% 爆率（抽中极为罕见的纯金 UR 终极神卡！）
 
-        const pool = monsters.filter(m => m.rarity === rarity);
-        const selected = pool[Math.floor(Math.random() * pool.length)];
-        return { name: selected.name, rarity: selected.rarity, image: selected.image, sell: prices[selected.rarity] };
-    }
-
+    const pool = monsters.filter(m => m.rarity === rarity);
+    const selected = pool[Math.floor(Math.random() * pool.length)];
+    return { name: selected.name, rarity: selected.rarity, image: selected.image, sell: prices[selected.rarity] };
+}
     function tryDraw(count) {
         const cost = count === 1 ? 100 : 1000;
         if (gold < cost) { alert("金币不足"); return; }
@@ -558,28 +625,29 @@
             btn.innerText = `下一张 (${currentQueueIndex + 1}/${cardQueue.length}) ➡️`;
         }
 
-        setTimeout(() => {
-            giantCard.className = `giant-card g-${monster.rarity}`;
-            giantCard.innerHTML = `
-                <div class="giant-rarity">${monster.rarity}</div>
-                <img src="${monster.image}">
-                <div>
-                    <div class="giant-name">${monster.name}</div>
-                    <div class="giant-price">回收价值：${monster.sell} 金币</div>
-                </div>
-            `;
-            
-            giantCard.classList.add("pop-up");
+     setTimeout(() => {
+        giantCard.className = `giant-card g-${monster.rarity}`;
+        giantCard.innerHTML = `
+            <div class="giant-rarity">${monster.rarity}</div>
+            <img src="${monster.image}">
+            <div>
+                <div class="giant-name">${monster.name}</div>
+        `;
 
-            // 🚀 触发终极 SSR 金光辐射特效 🚀
-            if (monster.rarity === "SSR") {
-                stage.classList.add("ssr-stage");
-                triggerSSRBlastEffects();
-            }
+        giantCard.classList.add("pop-up");
 
-            currentQueueIndex++;
-        }, 150);
-    }
+        // 触发终极 SSR 金光辐射特效
+        if (monster.rarity === "SSR") {
+            stage.classList.add("ssr-stage");
+            triggerSSRBlastEffects();
+        }
+
+        currentQueueIndex++;
+
+        // 🌟 【完美位置】在这里引爆你的大厂全屏震动与横幅特效！
+        applyHighEndEffects(monster.rarity);
+
+    }, 150);
 
     // 🚀 【全新实现】动态生成中心向外喷射光束的代码逻辑 🚀
     function triggerSSRBlastEffects() {
@@ -714,6 +782,37 @@
     }
 
     updateGold(); updatePriceLabels(); renderInventory();
+
+        // ==================== 👑 全屏视觉大厂高档特效触发器 👑 ====================
+function applyHighEndEffects(rarity) {
+    // 每次翻卡前，利落地清除上一次的横幅和震动状态
+    document.body.classList.remove("screen-shake");
+
+    if (rarity === "UR") {
+        // 0.3% 究极神话出货！瞬间激活全屏剧烈碎裂震动
+        setTimeout(() => document.body.classList.add("screen-shake"), 5);
+        
+        // 屏幕上方凌空砸下一道亮瞎眼的【全息金色神话大横幅】
+        let urBanner = document.createElement("div");
+        urBanner.innerHTML = "✨ 👑 究极神话 UR 诞生 👑 ✨";
+        urBanner.style = "position:fixed; top:15%; left:50%; transform:translate(-50%,-50%); color:#eab308; font-size:42px; font-weight:bold; text-shadow:0 0 25px #eab308, 0 0 5px #fff; z-index:99999; text-align:center; width:100%; pointer-events:none; font-family:'Microsoft YaHei',sans-serif; animation: urGlow 0.5s infinite alternate;";
+        document.body.appendChild(urBanner);
+        
+        // 狂震 2.5 秒后，横幅消失，屏幕恢复平静
+        setTimeout(() => { urBanner.remove(); document.body.classList.remove("screen-shake"); }, 2500);
+    } 
+    else if (rarity === "SSR") {
+        // 2.7% 传说出货！在屏幕上方拉起一道金光闪闪的炫酷横幅
+        let ssrBanner = document.createElement("div");
+        ssrBanner.innerHTML = "🌟 传说级 SSR 出货 🌟";
+        ssrBanner.style = "position:fixed; top:15%; left:50%; transform:translate(-50%,-50%); color:#fbbf24; font-size:32px; font-weight:bold; text-shadow:0 0 15px #fbbf24; z-index:99999; text-align:center; width:100%; pointer-events:none; font-family:'Microsoft YaHei',sans-serif;";
+        document.body.appendChild(ssrBanner);
+        setTimeout(() => ssrBanner.remove(), 2000);
+    }
+}
 </script>
 </body>
+
+    
 </html>
+
