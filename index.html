@@ -789,15 +789,17 @@
     }
 
     // ==================== 🎲 抽卡核心算法 ====================
+// ==================== 💎 100% 精准控率 & 零卡死安全抽卡核心全家桶 💎 ====================
+
 function executeDrawCore(times) {
-    // 🔍 【安全防御1】：安全获取当前选中的卡包对象，防止后面 pack.cost 报错卡死
+    // 🔍 【安全防御 1】：安全获取当前选中的卡包对象，防止后面 pack.cost 报错卡死
     let currentPackCost = 100; 
     if (typeof PACKS_CONFIG !== 'undefined' && typeof selectedPackId !== 'undefined') {
         const foundPack = PACKS_CONFIG.find(p => p.id === selectedPackId);
         if (foundPack) currentPackCost = foundPack.cost;
     }
 
-    // 🪙 【安全防御2】：动态计算单抽价格（优先读后台输入框，其次读卡包配置，最后保底100）
+    // 🪙 【安全防御 2】：动态计算单抽价格（优先读后台输入框，其次读卡包配置，最后保底100）
     const singleCost = Number(document.getElementById("packCostInput")?.value) || currentPackCost;
     const totalCost = singleCost * times;
 
@@ -814,13 +816,13 @@ function executeDrawCore(times) {
     // 清空本次抽卡展示队列
     viewQueue = [];
 
-    // 📊 实时捕获后台精调的 RATES 边界
+    // 📊 3. 实时捕获后台精调的 RATES 边界
     let bUR = RATES["UR"];
     let bSSR = bUR + RATES["SSR"];
     let bSR = bSSR + RATES["SR"];
     let bR = bSR + RATES["R"];
 
-    // 🎯 核心抽卡循环
+    // 🎯 4. 核心抽卡循环
     for (let i = 0; i < times; i++) {
         let roll = Math.random() * 100;
         let rarity = "N";
@@ -830,20 +832,38 @@ function executeDrawCore(times) {
         else if (roll < bSR) rarity = "SR";
         else if (roll < bR) rarity = "R";
 
-        // ⭐【精准对接】去你图1定义的 monsters 总池里过滤对应稀有度的宝可梦
-        let filteredPool = monsters.filter(m => m.rarity === rarity);
+        // ⭐【精准对接】优先去你定义的 monsters 总池里过滤对应稀有度的宝可梦
+        let filteredPool = [];
+        if (typeof monsters !== 'undefined' && monsters.length > 0) {
+            filteredPool = monsters.filter(m => m.rarity === rarity);
+        } else if (typeof pack !== 'undefined' && pack.pool) {
+            filteredPool = pack.pool.filter(m => m.rarity === rarity);
+        }
 
         // ⭐【防穿透锁】如果该级别真的没卡，严格向下兼容，绝对不往上穿透抽 UR
         if (filteredPool.length === 0) {
             const fallbacks = ["SSR", "SR", "R", "N"];
             for (let f of fallbacks) {
-                filteredPool = monsters.filter(m => m.rarity === f);
+                if (typeof monsters !== 'undefined') {
+                    filteredPool = monsters.filter(m => m.rarity === f);
+                }
+                if (filteredPool.length === 0 && typeof pack !== 'undefined' && pack.pool) {
+                    filteredPool = pack.pool.filter(m => m.rarity === f);
+                }
                 if (filteredPool.length > 0) break;
             }
         }
 
         // 终极总池兜底
-        if (filteredPool.length === 0) filteredPool = monsters;
+        if (filteredPool.length === 0) {
+            filteredPool = (typeof monsters !== 'undefined' && monsters.length > 0) ? monsters : (typeof pack !== 'undefined' ? pack.pool : []);
+        }
+
+        // 如果连总池都完全没有卡，跳出防卡死
+        if (!filteredPool || filteredPool.length === 0) {
+            alert("❌ 错误：未在系统内找到有效的卡池配置，请检查 monsters 变量！");
+            return;
+        }
 
         // 随机抓取并塞入展示队列
         let rolled = filteredPool[Math.floor(Math.random() * filteredPool.length)];
@@ -854,12 +874,12 @@ function executeDrawCore(times) {
         if (typeof warehouse !== 'undefined') warehouse.push({ ...rolled });
     }
 
-    // 🎬 触发切卡展台动画展出
+    // 🎬 5. 触发切卡展台动画展出
     queueIdx = 0;
     document.getElementById("showcardOverlay").style.display = "flex";
     triggerNextQueuedCard();
 
-    // 💾 严格同步到对应的本地缓存
+    // 💾 6. 严格同步到对应的本地缓存（双轨备份，两边都存）
     if (typeof inventory !== 'undefined') {
         localStorage.setItem("pg_inventory", JSON.stringify(inventory));
     }
@@ -868,7 +888,7 @@ function executeDrawCore(times) {
     }
 }
 
-    function triggerNextQueuedCard() {
+// =======================================================================================
         const giantCard = document.getElementById("giantCard");
         const overlay = document.getElementById("showcardOverlay");
         giantCard.classList.remove("pop-up");
