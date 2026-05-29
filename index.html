@@ -801,77 +801,78 @@
         const singleCost = Number(document.getElementById("packCostInput")?.value) || currentPackCost;
         const totalCost = singleCost * times;
 
-        if (gold < totalCost) {
-            alert("🪙 余额不足！请前去高级后台充值，或回收卡片。");
+// 804行开始替换
+    if (gold < totalCost) {
+        alert("🪙 余额不足！请前去高级后台充值，或回收卡片。");
+        return;
+    }
+
+    gold -= totalCost;
+    updateGoldDisplay();
+
+    viewQueue = [];
+
+    // 📊 1. 强转纯数字，彻底根除字符串拼接导致爆率失效的隐患
+    const rateUR  = Number(RATES["UR"])  || 0;
+    const rateSSR = Number(RATES["SSR"]) || 0;
+    const rateSR  = Number(RATES["SR"])  || 0;
+    const rateR   = Number(RATES["R"])   || 0;
+
+    // 🎯 2. 重新计算精密概率边界线
+    let bUR  = rateUR;
+    let bSSR = bUR + rateSSR;
+    let bSR  = bSSR + rateSR;
+    let bR   = bSR + rateR;
+
+    // 🎯 3. 核心抽卡循环
+    for (let i = 0; i < times; i++) {
+        let roll = Math.random() * 100;
+        let rarity = "N";
+
+        // 严格按照概率区间判定
+        if (roll < bUR) rarity = "UR";
+        else if (roll < bSSR) rarity = "SSR";
+        else if (roll < bSR) rarity = "SR";
+        else if (roll < bR) rarity = "R";
+
+        // 🔍 4. 纯概率过滤：精准对接卡池
+        let filteredPool = [];
+        if (typeof monsters !== 'undefined' && monsters.length > 0) {
+            filteredPool = monsters.filter(m => m.rarity === rarity);
+        } else if (pack && pack.pool) {
+            filteredPool = pack.pool.filter(m => m.rarity === rarity);
+        }
+
+        // 🚨 4.5 终极兜底：如果当前稀有度没卡，从总池捞，绝对不偏袒 SSR
+        if (filteredPool.length === 0) {
+            filteredPool = (typeof monsters !== 'undefined' && monsters.length > 0) ? monsters : (pack ? pack.pool : []);
+        }
+
+        // 🛑 严格卡池防空锁
+        if (!filteredPool || filteredPool.length === 0) {
+            alert("❌ 错误：未在系统内找到有效的卡池配置！");
             return;
         }
 
-        gold -= totalCost;
-        updateGoldDisplay();
+        // 🎲 5. 随机抓取并塞入展示队列
+        let rolled = filteredPool[Math.floor(Math.random() * filteredPool.length)];
+        viewQueue.push(rolled);
 
-        viewQueue = [];
-
-        let bUR = RATES["UR"];
-        let bSSR = bUR + RATES["SSR"];
-        let bSR = bSSR + RATES["SR"];
-        let bR = bSR + RATES["R"];
-
-        for (let i = 0; i < times; i++) {
-            let roll = Math.random() * 100;
-            let rarity = "N";
-
-            if (roll < bUR) rarity = "UR";
-            else if (roll < bSSR) rarity = "SSR";
-            else if (roll < bSR) rarity = "SR";
-            else if (roll < bR) rarity = "R";
-
-            let filteredPool = [];
-            if (typeof monsters !== 'undefined' && monsters.length > 0) {
-                filteredPool = monsters.filter(m => m.rarity === rarity);
-            } else if (pack && pack.pool) {
-                filteredPool = pack.pool.filter(m => m.rarity === rarity);
-            }
-
-            if (filteredPool.length === 0) {
-                const fallbacks = ["SSR", "SR", "R", "N"];
-                for (let f of fallbacks) {
-                    if (typeof monsters !== 'undefined') {
-                        filteredPool = monsters.filter(m => m.rarity === f);
-                    }
-                    if (filteredPool.length === 0 && pack && pack.pool) {
-                        filteredPool = pack.pool.filter(m => m.rarity === f);
-                    }
-                    if (filteredPool.length > 0) break;
-                }
-            }
-
-            if (filteredPool.length === 0) {
-                filteredPool = (typeof monsters !== 'undefined' && monsters.length > 0) ? monsters : (pack ? pack.pool : []);
-            }
-
-            if (!filteredPool || filteredPool.length === 0) {
-                alert("❌ 错误：未在系统内找到有效的卡池配置，请检查当前卡包内是否有卡牌定义！");
-                return;
-            }
-
-            let rolled = filteredPool[Math.floor(Math.random() * filteredPool.length)];
-            viewQueue.push(rolled);
-            
-            if (typeof inventory !== 'undefined') inventory.push({ ...rolled });
-            if (typeof warehouse !== 'undefined') warehouse.push({ ...rolled });
-        }
-
-        queueIdx = 0;
-        document.getElementById("showcardOverlay").style.display = "flex";
-        triggerNextQueuedCard();
-
-        if (typeof inventory !== 'undefined') {
-            localStorage.setItem("pg_inventory", JSON.stringify(inventory));
-        }
-        if (typeof warehouse !== 'undefined') {
-            localStorage.setItem("pg_warehouse_4", JSON.stringify(warehouse));
-        }
+        // 🎒 6. 双轨兼容推进
+        if (typeof inventory !== 'undefined') inventory.push({ ...rolled });
+        if (typeof warehouse !== 'undefined') warehouse.push({ ...rolled });
     }
+
+    // 🎬 7. 触发展示
+    queueIdx = 0;
+    document.getElementById("showcardOverlay").style.display = "flex";
+    triggerNextQueuedCard();
+
+    // 💾 8. 同步本地缓存
+    if (typeof inventory !== 'undefined') {
+        localStorage.setItem("pg_inventory", JSON.stringify(inventory));
+    }
+}
 
     // ==================== 🎬 二级卡牌展台切卡控制 ====================
     function triggerNextQueuedCard() {
