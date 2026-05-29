@@ -789,28 +789,38 @@
     }
 
     // ==================== 🎲 抽卡核心算法 ====================
- function executeDrawCore(times) {
-    // 🪙 1. 简易扣费逻辑（完美兼容原版 gold）
- const singleCost = Number(document.getElementById("packCostInput")?.value) || (typeof pack !== 'undefined' ? pack.cost : 100);
+function executeDrawCore(times) {
+    // 🔍 【安全防御1】：安全获取当前选中的卡包对象，防止后面 pack.cost 报错卡死
+    let currentPackCost = 100; 
+    if (typeof PACKS_CONFIG !== 'undefined' && typeof selectedPackId !== 'undefined') {
+        const foundPack = PACKS_CONFIG.find(p => p.id === selectedPackId);
+        if (foundPack) currentPackCost = foundPack.cost;
+    }
+
+    // 🪙 【安全防御2】：动态计算单抽价格（优先读后台输入框，其次读卡包配置，最后保底100）
+    const singleCost = Number(document.getElementById("packCostInput")?.value) || currentPackCost;
     const totalCost = singleCost * times;
 
+    // 💰 检查余额
     if (gold < totalCost) {
         alert("🪙 余额不足！请前去高级后台充值，或回收卡片。");
         return;
     }
 
+    // 扣费并更新显示
     gold -= totalCost;
     updateGoldDisplay();
 
+    // 清空本次抽卡展示队列
     viewQueue = [];
 
-    // 📊 2. 实时捕获后台精调的 RATES 边界
+    // 📊 实时捕获后台精调的 RATES 边界
     let bUR = RATES["UR"];
     let bSSR = bUR + RATES["SSR"];
     let bSR = bSSR + RATES["SR"];
     let bR = bSR + RATES["R"];
 
-    // 🎯 3. 核心抽卡循环
+    // 🎯 核心抽卡循环
     for (let i = 0; i < times; i++) {
         let roll = Math.random() * 100;
         let rarity = "N";
@@ -820,7 +830,7 @@
         else if (roll < bSR) rarity = "SR";
         else if (roll < bR) rarity = "R";
 
-        // ⭐【精准对接】去你图1定义的 monsters 里面过滤对应稀有度的宝可梦
+        // ⭐【精准对接】去你图1定义的 monsters 总池里过滤对应稀有度的宝可梦
         let filteredPool = monsters.filter(m => m.rarity === rarity);
 
         // ⭐【防穿透锁】如果该级别真的没卡，严格向下兼容，绝对不往上穿透抽 UR
@@ -832,26 +842,29 @@
             }
         }
 
-        // 终极保底
+        // 终极总池兜底
         if (filteredPool.length === 0) filteredPool = monsters;
 
         // 随机抓取并塞入展示队列
         let rolled = filteredPool[Math.floor(Math.random() * filteredPool.length)];
         viewQueue.push(rolled);
         
-        // ⭐【双轨兼容保护】同时推进 inventory 和 warehouse，彻底解决图 6 渲染卡死问题！
+        // ⭐【双轨兼顾保护】：同时推进 inventory 和 warehouse，彻底解决不同版本导致的卡死问题！
         if (typeof inventory !== 'undefined') inventory.push({ ...rolled });
         if (typeof warehouse !== 'undefined') warehouse.push({ ...rolled });
     }
 
-    // 🎬 4. 触发切卡展台动画展出
+    // 🎬 触发切卡展台动画展出
     queueIdx = 0;
     document.getElementById("showcardOverlay").style.display = "flex";
     triggerNextQueuedCard();
 
-    // 💾 5. 严格同步到你本地对应的本地缓存 pg_inventory
+    // 💾 严格同步到对应的本地缓存
     if (typeof inventory !== 'undefined') {
         localStorage.setItem("pg_inventory", JSON.stringify(inventory));
+    }
+    if (typeof warehouse !== 'undefined') {
+        localStorage.setItem("pg_warehouse_4", JSON.stringify(warehouse));
     }
 }
 
