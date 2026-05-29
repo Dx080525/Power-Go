@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🌟 Power Go Premium 4.6 动态回收价商用版 🌟</title>
+    <title>🌟 Power Go Premium 4.7 爆率+回收双控商用版 🌟</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         /* ==================== 👑 全局变量与手机端适配重构 👑 ==================== */
@@ -310,7 +310,7 @@
 
     <div class="header-bar">
         <div class="header-top">
-            <div class="brand-title">POWER GO 4.6</div>
+            <div class="brand-title">POWER GO 4.7</div>
             <div class="gold-badge">🪙 <span id="goldVal">5000</span></div>
         </div>
         <div class="search-container">
@@ -393,6 +393,36 @@
             </div>
 
             <div class="admin-section">
+                <div class="admin-section-title">📊 全局抽卡爆率精密调配</div>
+                <p style="color:#64748b; font-size:11px; margin-bottom:10px;">请确保五项概率相加【严格等于 100%】，否则会导致抽卡数据错乱！</p>
+                <div class="admin-row">
+                    <div class="form-group">
+                        <label>N 概率 (%)</label>
+                        <input type="number" id="rateN" class="form-control" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label>R 概率 (%)</label>
+                        <input type="number" id="rateR" class="form-control" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label>SR 概率 (%)</label>
+                        <input type="number" id="rateSR" class="form-control" step="0.1">
+                    </div>
+                </div>
+                <div class="admin-row">
+                    <div class="form-group">
+                        <label>SSR 概率 (%)</label>
+                        <input type="number" id="rateSSR" class="form-control" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label>UR 概率 (%)</label>
+                        <input type="number" id="rateUR" class="form-control" step="0.1">
+                    </div>
+                </div>
+                <button class="admin-btn" style="background:linear-gradient(135deg, #3b82f6, #1d4ed8);" onclick="saveCustomRates()">确认更新全服爆率</button>
+            </div>
+
+            <div class="admin-section">
                 <div class="admin-section-title">🖼️ 卡包封面与参数可视化配置</div>
                 <div class="form-group">
                     <label>选择要修改的卡包系列</label>
@@ -427,11 +457,11 @@
                     <div class="form-group">
                         <label>稀有度级别</label>
                         <select id="newCardRarity" class="form-control">
-                            <option value="N">N (80%)</option>
-                            <option value="R">R (12%)</option>
-                            <option value="SR">SR (5%)</option>
-                            <option value="SSR">SSR (2.8%)</option>
-                            <option value="UR">UR (0.2%)</option>
+                            <option value="N">N</option>
+                            <option value="R">R</option>
+                            <option value="SR">SR</option>
+                            <option value="SSR">SSR</option>
+                            <option value="UR">UR</option>
                         </select>
                     </div>
                 </div>
@@ -570,11 +600,13 @@
     // 后台独立核心安全密钥锁
     let adminPassword = localStorage.getItem("pg_admin_pwd") !== null ? localStorage.getItem("pg_admin_pwd") : "888888";
 
-    // 💰 回收价格核心矩阵（支持动态缓存读取）
+    // 💰 回收价格核心配置读取
     const DEFAULT_RECOVER_PRICES = { "N": 10, "R": 50, "SR": 200, "SSR": 800, "UR": 3000 };
     let recoverPrices = localStorage.getItem("pg_recover_prices") !== null ? JSON.parse(localStorage.getItem("pg_recover_prices")) : DEFAULT_RECOVER_PRICES;
 
-    const RATES = { "UR": 0.2, "SSR": 2.8, "SR": 5.0, "R": 12.0, "N": 80.0 };
+    // 📊 抽卡爆率核心配置读取
+    const DEFAULT_RATES = { "UR": 0.2, "SSR": 2.8, "SR": 5.0, "R": 12.0, "N": 80.0 };
+    let RATES = localStorage.getItem("pg_custom_rates") !== null ? JSON.parse(localStorage.getItem("pg_custom_rates")) : DEFAULT_RATES;
 
     let viewQueue = [];
     let queueIdx = 0;
@@ -588,7 +620,8 @@
         renderPacksMarket();
         renderWarehouseView();
         buildAdminPackSelector();
-        initAdminPricesForm(); // 装载回收价格到表单
+        initAdminPricesForm(); // 装载回收价
+        initAdminRatesForm();  // 装载新添加的自定义爆率
         document.getElementById("gmGoldIn").value = gold;
     };
 
@@ -618,8 +651,40 @@
         recoverPrices["UR"] = parseInt(document.getElementById("priceUR").value) || 0;
 
         localStorage.setItem("pg_recover_prices", JSON.stringify(recoverPrices));
-        renderWarehouseView(); // 即时刷新仓库内显示的回收价
-        alert("💰 全局卡片回收出售价格已重新洗牌！");
+        renderWarehouseView(); 
+        alert("💰 全局卡片出售回收价格已重新洗牌！");
+    }
+
+    // ==================== 📊 动态爆率控制逻辑 ====================
+    function initAdminRatesForm() {
+        document.getElementById("rateN").value = RATES["N"];
+        document.getElementById("rateR").value = RATES["R"];
+        document.getElementById("rateSR").value = RATES["SR"];
+        document.getElementById("rateSSR").value = RATES["SSR"];
+        document.getElementById("rateUR").value = RATES["UR"];
+    }
+
+    function saveCustomRates() {
+        let n = parseFloat(document.getElementById("rateN").value) || 0;
+        let r = parseFloat(document.getElementById("rateR").value) || 0;
+        let sr = parseFloat(document.getElementById("rateSR").value) || 0;
+        let ssr = parseFloat(document.getElementById("rateSSR").value) || 0;
+        let ur = parseFloat(document.getElementById("rateUR").value) || 0;
+
+        // 严密校验相加是否等于 100
+        if (Math.abs((n + r + sr + ssr + ur) - 100) > 0.01) {
+            alert(`❌ 更新失败！当前填写的概率总和为 ${(n + r + sr + ssr + ur).toFixed(1)}%。五项概率相加必须严格等于 100%！`);
+            return;
+        }
+
+        RATES["N"] = n;
+        RATES["R"] = r;
+        RATES["SR"] = sr;
+        RATES["SSR"] = ssr;
+        RATES["UR"] = ur;
+
+        localStorage.setItem("pg_custom_rates", JSON.stringify(RATES));
+        alert("📊 全局抽卡重力爆率已重新洗牌！立即生效。");
     }
 
     // ==================== 🔑 后台密码核验安全锁逻辑 ====================
@@ -737,6 +802,7 @@
         updateGoldDisplay();
 
         viewQueue = [];
+        // 动态边界计算，实时吃掉最新的 RATES 控制爆率
         let bUR = RATES["UR"];
         let bSSR = bUR + RATES["SSR"];
         let bSR = bSSR + RATES["SR"];
@@ -756,7 +822,6 @@
             
             let rolled = filteredPool[Math.floor(Math.random() * filteredPool.length)];
             viewQueue.push(rolled);
-            // 抽卡写入仓库时动态与当前全局回收价热绑定
             warehouse.push({ ...rolled });
         }
 
@@ -814,7 +879,6 @@
         
         container.innerHTML = "";
         displayList.forEach((m, idx) => {
-            // 实时获取配置里的最新价格，防止后台修改后旧卡对不上
             let dynamicPrice = recoverPrices[m.rarity] !== undefined ? recoverPrices[m.rarity] : 10;
             const node = document.createElement("div");
             node.className = `bag-item border-${m.rarity}`;
