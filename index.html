@@ -1,44 +1,44 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>萌宠抽卡乐园 - SSR超级特效版</title>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>宝可梦爆裂抽卡系统 - 重制版</title>
     <style>
-   /* ==================== 👑 纯视觉大厂高档特效 👑 ==================== */
-/* SSR卡牌的璀璨金光 */
-.g-SSR {
-    border: 3px solid #fbbf24 !important;
-    box-shadow: 0 0 20px rgba(251, 191, 36, 0.6) !important;
-}
+        /* ==================== 👑 纯视觉大厂高档特效 👑 ==================== */
+        /* SSR卡牌的璀璨金边 */
+        .g-SSR {
+            border: 3px solid #fbbf24 !important;
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.6) !important;
+        }
 
-/* UR卡牌专属：终极神话金色流光 */
-.g-UR {
-    border: 3px solid #eab308 !important;
-    box-shadow: 0 0 25px rgba(234, 179, 8, 0.9), inset 0 0 15px rgba(234, 179, 8, 0.5) !important;
-    animation: urGlow 1.5s infinite alternate ease-in-out !important;
-}
+        /* UR卡牌专属：终极神话金色流光 */
+        .g-UR {
+            border: 3px solid #eab308 !important;
+            box-shadow: 0 0 25px rgba(234, 179, 8, 0.9), inset 0 0 15px rgba(234, 179, 8, 0.5) !important;
+            animation: urGlow 1.5s infinite alternate ease-in-out !important;
+        }
 
-@keyframes urGlow {
-    0% { transform: scale(1); filter: brightness(1) drop-shadow(0 0 5px #eab308); }
-    100% { transform: scale(1.02); filter: brightness(1.25) drop-shadow(0 0 15px #eab308); }
-}
+        /* UR卡牌的呼吸缩放动画效果 */
+        @keyframes urGlow {
+            0% { transform: scale(1); filter: brightness(1) drop-shadow(0 0 5px #eab308); }
+            100% { transform: scale(1.02); filter: brightness(1.25) drop-shadow(0 0 15px #eab308); }
+        }
 
-/* 屏幕震动特效：抽中神话时的物理震撼 */
-.screen-shake {
-    animation: shakeEffect 0.4s cubic-bezier(.36,.07,.19,.97) both !important;
-}
+        /* 全屏震动特效的类名 */
+        .screen-shake {
+            animation: shakeEffect 0.4s cubic-bezier(.36,.07,.19,.97) both !important;
+        }
 
-@keyframes shakeEffect {
-    10%, 90% { transform: translate3d(-2px, 0, 0); }
-    20%, 80% { transform: translate3d(4px, 0, 0); }
-    30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
-    40%, 60% { transform: translate3d(6px, 0, 0); }
-}
-/* ================================================================ */
-        
-        
+        /* 物理碎裂震动轨迹动画 */
+        @keyframes shakeEffect {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+            40%, 60% { transform: translate3d(6px, 0, 0); }
+        }
+        /* ================================================================= */
+
         * {
             margin: 0;
             padding: 0;
@@ -47,566 +47,279 @@
 
         body {
             font-family: "Segoe UI", sans-serif;
-            background: url('https://img-baofeng.cdn.bcebos.com/bfeimg/jpg/992bcda7f81498877bcbb6a56e545465.jpg') no-repeat center center fixed;
-            background-size: cover;
+            background: #111827;
+            color: white;
             min-height: 100vh;
-            color: #f0f4f8;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             padding: 20px;
             overflow-x: hidden;
         }
 
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(10, 16, 32, 0.65);
-            z-index: -1;
+        header {
+            margin-bottom: 30px;
+            text-align: center;
         }
 
         h1 {
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 36px;
-            letter-spacing: 2px;
-            color: #00f2fe;
-            text-shadow: 0 0 15px rgba(0, 242, 254, 0.6);
-            font-weight: 800;
+            font-size: 2.5rem;
+            color: #f59e0b;
+            text-shadow: 0 0 10px rgba(245,158,11,0.5);
+            margin-bottom: 10px;
         }
 
-        .container {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
+        .status-panel {
+            background: #1f2937;
+            padding: 15px 30px;
+            border-radius: 50px;
+            display: flex;
+            gap: 40px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            font-size: 1.2rem;
+            border: 1px solid #374151;
+        }
+
+        .gold-count { color: #fbbf24; font-weight: bold; }
+
+        .btn-container {
+            display: flex;
             gap: 20px;
-            max-width: 1300px;
-            margin: 0 auto;
+            margin-bottom: 40px;
         }
 
-        .panel {
-            background: rgba(22, 32, 54, 0.6);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border-radius: 24px;
-            padding: 20px;
-            border: 2px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 15px 35px rgba(0,0,0,.4), inset 0 0 15px rgba(255,255,255,0.05);
-        }
-
-        .panel h2, .bag-title {
-            color: #ffffff;
-            font-size: 22px;
-            margin-bottom: 15px;
-            border-left: 4px solid #00c6fb;
-            padding-left: 8px;
-        }
-
-        .top-bar {
-            margin-bottom: 20px;
-            max-width: 1300px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .gold-box {
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 165, 0, 0.05));
-            backdrop-filter: blur(10px);
-            padding: 18px;
-            border-radius: 20px;
-            font-size: 26px;
+        .draw-btn {
+            padding: 15px 40px;
+            font-size: 1.2rem;
             font-weight: bold;
-            text-align: center;
-            color: #ffd700;
-            border: 2px solid rgba(255, 215, 0, 0.4);
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.15);
-        }
-
-        .gacha-buttons {
-            display: flex;
-            gap: 15px;
-            margin: 20px 0;
-            flex-wrap: wrap;
-        }
-
-        button {
             border: none;
+            border-radius: 12px;
             cursor: pointer;
-            transition: .2s;
-            font-weight: bold;
-        }
-
-        .gacha-btn {
-            flex: 1;
-            min-width: 180px;
-            padding: 18px;
-            border-radius: 18px;
-            font-size: 20px;
+            transition: all 0.2s;
             color: white;
-            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 4px 14px rgba(0,0,0,0.3);
         }
 
-        .single { background: linear-gradient(135deg, #00c6fb, #005bea); box-shadow: 0 5px 15px rgba(0, 198, 251, 0.3); }
-        .ten { background: linear-gradient(135deg, #ff9966, #ff5e62); box-shadow: 0 5px 15px rgba(255, 94, 98, 0.3); }
-        .gacha-btn:hover { transform: translateY(-3px) scale(1.01); filter: brightness(1.1); }
+        .btn-single { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+        .btn-single:hover { background: linear-gradient(135deg, #60a5fa, #2563eb); transform: translateY(-2px); }
+        .btn-ten { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+        .btn-ten:hover { background: linear-gradient(135deg, #a78bfa, #7c3aed); transform: translateY(-2px); }
+        .draw-btn:disabled { background: #4b5563; color: #9ca3af; cursor: not-allowed; transform: none; }
 
-        .rate-board {
-            background: rgba(10, 15, 28, 0.5);
-            border-radius: 18px;
-            padding: 15px;
-            border: 1px solid rgba(0, 242, 254, 0.2);
-            line-height: 2;
-            font-size: 16px;
-            color: #cbd5e1;
-        }
-        .rate-board h3 { color: #00f2fe; }
-
-        .result-title { margin-top: 20px; margin-bottom: 15px; font-size: 22px; color: #94a3b8; }
-
-        /* ==== 🃏 底层结果小格子 ==== */
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-            gap: 15px;
-        }
-
-        .static-card {
-            background: rgba(15, 23, 42, 0.6);
-            border-radius: 16px;
-            padding: 12px;
-            text-align: center;
-            border: 1px solid rgba(255,255,255,0.1);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .static-card img { width: 70px; height: 70px; object-fit: contain; }
-        .static-card .c-name { font-weight: bold; margin-top: 5px; font-size: 14px; }
-        .static-card .c-rarity { font-size: 12px; padding: 1px 6px; border-radius: 8px; margin-top: 3px; background: rgba(0,0,0,0.3); }
-
-        /* ==== 📦 拆包蒙层 ==== */
-        .pack-overlay {
-            display: none;
+        /* 翻卡弹窗大屏 */
+        #showcardOverlay {
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(4, 7, 16, 0.95);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-        }
-
-        .pack-booster {
-            width: 280px;
-            height: 420px;
-            background: linear-gradient(135deg, #1e1b4b 0%, #311042 50%, #0f172a 100%);
-            border: 3px solid #00f2fe;
-            border-radius: 20px;
-            box-shadow: 0 0 40px rgba(0, 242, 254, 0.5);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
-            padding: 40px 20px;
-            cursor: pointer;
-            position: relative;
-            transition: all 0.3s ease;
-            user-select: none;
-            animation: float 2s infinite alternate ease-in-out;
-        }
-        @keyframes float { 0% { transform: translateY(0px); } 100% { transform: translateY(-12px); } }
-        .pack-tip {
-            color: #ffffff; font-size: 13px; background: rgba(0, 242, 254, 0.3);
-            padding: 8px 20px; border-radius: 20px; border: 1px solid #00f2fe;
-            animation: packPulse 0.8s infinite alternate;
-        }
-        @keyframes packPulse { from { transform: scale(1); opacity: 0.8; } to { transform: scale(1.05); opacity: 1; } }
-        .pack-booster.torn { transform: scale(1.4); opacity: 0; filter: brightness(3) blur(4px); }
-
-        /* ==== 🎪 ✨ 全屏大卡特写舞台 ==== */
-        .showcard-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(2, 4, 10, 0.98);
-            z-index: 3000;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            overflow: hidden;
-            transition: background 0.5s ease;
-        }
-
-        /* 抽到SSR时，舞台遮罩层进化为金光底色 */
-        .showcard-overlay.ssr-stage {
-            background: radial-gradient(circle, rgba(70,45,5,0.98) 0%, rgba(2,4,10,0.99) 100%);
-        }
-
-        /* 框小，卡片内容大 */
-        .giant-card {
-            width: 340px;        
-            height: 520px;       
-            border-radius: 35px;
-            padding: 25px;       
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 0 60px rgba(0,0,0,0.8);
-            position: relative;
-            transform: scale(0.3) rotate(-10deg);
-            opacity: 0;
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            color: white;
-            text-align: center;
-            z-index: 3100;
-        }
-
-        .giant-card.pop-up {
-            transform: scale(1) rotate(0deg);
-            opacity: 1;
-        }
-
-        /* 卡大：图片撑满框左右 */
-        .giant-card img {
-            width: 270px;        
-            height: 270px;       
-            object-fit: contain;
-            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.6));
-            margin-top: 10px;
-        }
-
-        .giant-name { font-size: 32px; font-weight: 900; text-shadow: 0 4px 10px rgba(0,0,0,0.5); margin-top: 5px; }
-        .giant-rarity { font-size: 18px; font-weight: bold; padding: 2px 20px; border-radius: 12px; background: rgba(0,0,0,0.4); }
-        .giant-price { font-size: 16px; opacity: 0.9; margin-top: 2px; }
-
-        /* 稀有度专属颜色 */
-        .g-N { background: linear-gradient(135deg, #475569, #1e293b); border: 3px solid #94a3b8; box-shadow: 0 0 30px rgba(148, 163, 184, 0.3); }
-        .g-R { background: linear-gradient(135deg, #0284c7, #0f172a); border: 3px solid #38bdf8; box-shadow: 0 0 40px rgba(56, 189, 248, 0.5); }
-        .g-SR { background: linear-gradient(135deg, #7c3aed, #1e1b4b); border: 3px solid #c084fc; box-shadow: 0 0 50px rgba(192, 132, 252, 0.6); }
-        
-        /* SSR 尊贵金卡样式 + 抽中轻微震颤抖动 */
-        .g-SSR {
-            background: linear-gradient(135deg, #b45309 0%, #d97706 40%, #1e1503 100%);
-            border: 4px solid #fbbf24;
-            animation: giantSsr 1.5s infinite alternate ease-in-out, ssrShock 0.4s ease-out once;
-        }
-        .g-SSR::after {
-            content: ''; position: absolute; top:-50%; left:-50%; width:200%; height:200%;
-            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.4), transparent);
-            transform: rotate(45deg); animation: giantShine 2.5s infinite linear;
-        }
-
-        @keyframes giantSsr {
-            0% { box-shadow: 0 0 40px #fbbf24, inset 0 0 15px #fbbf24; }
-            100% { box-shadow: 0 0 70px #ffea79, inset 0 0 30px #fbbf24; transform: scale(1.02); }
-        }
-        @keyframes giantShine { 0% { transform: translate(-30%, -30%) rotate(45deg); } 100% { transform: translate(30%, 30%) rotate(45deg); } }
-        @keyframes ssrShock { 0% { transform: scale(0.3) rotate(-15deg); } 50% { transform: scale(1.1) rotate(5deg); } 70% { transform: scale(0.95); } 100% { transform: scale(1) rotate(0deg); } }
-
-        /* 主控制按钮 */
-        .next-card-btn {
-            margin-top: 35px;
-            background: linear-gradient(90deg, #00f2fe, #4facfe);
-            color: #040710;
-            font-size: 20px;
-            font-weight: 900;
-            padding: 14px 55px;
-            border-radius: 35px;
-            box-shadow: 0 0 25px #00f2fe;
-            animation: btnPulse 0.6s infinite alternate;
-            z-index: 3200;
-        }
-        @keyframes btnPulse { from { transform: scale(1); } to { transform: scale(1.04); } }
-        .next-card-btn:hover { filter: brightness(1.2); }
-
-        /* ====================================================
-           🚀 【全新重写】核心：SSR 全屏放射极光冲锋爆炸特效 🚀
-           ==================================================== */
-        .ssr-hyper-explosion {
-            position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: 3050;
+            background: rgba(0,0,0,0.9);
+            z-index: 999;
             display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            backdrop-filter: blur(8px);
         }
 
-        /* 金色极光光束 */
-        .ray {
-            position: absolute;
-            top: 50%; left: 50%;
-            width: 4px;
-            height: 100vh;
-            background: linear-gradient(to top, transparent, #fff 50%, #fbbf24 80%, transparent);
-            transform-origin: top center;
+        .giant-card {
+            width: 320px;
+            height: 460px;
+            background: #1f2937;
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            border: 2px solid #4b5563;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            transform: scale(0.8);
             opacity: 0;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        /* 爆发式散射运动动画 */
-        @keyframes rayBlast {
-            0% {
-                transform: translate(-50%, -50%) rotate(var(--angle)) translateY(0) scaleY(0.3);
-                opacity: 0;
-                width: 2px;
-            }
-            20% {
-                opacity: 1;
-                width: 6px;
-            }
-            100% {
-                transform: translate(-50%, -50%) rotate(var(--angle)) translateY(-100vh) scaleY(2.5);
-                opacity: 0;
-                width: 1px;
-            }
-        }
+        .giant-card.pop-up { transform: scale(1); opacity: 1; }
+        .giant-rarity { font-size: 1.8rem; font-weight: bold; font-style: italic; align-self: flex-start; }
+        .giant-card img { width: 100%; height: 75%; object-fit: contain; border-radius: 10px; margin: 10px 0; }
+        .giant-name { font-size: 1.4rem; font-weight: bold; text-align: center; }
 
-        /* 金色能量光斑粒子 */
-        .sparkle {
-            position: absolute;
-            top: 50%; left: 50%;
-            border-radius: 50%;
-            background: radial-gradient(circle, #fff 0%, #ffb703 60%, transparent 100%);
-            box-shadow: 0 0 15px #fbbf24;
-            opacity: 0;
+        #nextCardBtn {
+            padding: 12px 35px;
+            font-size: 1.1rem;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(16,185,129,0.3);
         }
+        #nextCardBtn:hover { background: #059669; }
 
-        @keyframes sparkleBlast {
-            0% {
-                transform: translate(-50%, -50%) rotate(var(--angle)) translateY(0) scale(0.2);
-                opacity: 0;
-            }
-            30% {
-                opacity: 1;
-            }
-            100% {
-                transform: translate(-50%, -50%) rotate(var(--angle)) translateY(-80vh) scale(1.5);
-                opacity: 0;
-            }
-        }
-
-        /* 背包仓库系统 */
-        .inventory { display: flex; flex-direction: column; gap: 12px; max-height: 600px; overflow-y: auto; padding-right: 5px; }
-        .bag-item { display: flex; align-items: center; justify-content: space-between; padding: 12px; border-radius: 14px; background: rgba(15, 23, 42, 0.4); border: 1px solid rgba(255,255,255,0.1); }
-        .bag-item-left { display: flex; align-items: center; gap: 10px; }
-        .bag-item-img { width: 40px; height: 40px; object-fit: contain; }
-        .sell-btn { background: transparent; border: 1px solid #ff6b81; color: #ff6b81; padding: 8px 12px; border-radius: 10px; font-size: 14px; }
-        .sell-btn:hover { background: #ff6b81; color: white; box-shadow: 0 0 10px rgba(255,107,129,0.5); }
-        .sell-all { width: 100%; margin-top: 15px; background: linear-gradient(135deg,#ff758c,#ff7eb3); color: white; padding: 14px; border-radius: 16px; font-size: 18px; box-shadow: 0 4px 15px rgba(255,117,140,0.4); }
-        .empty { text-align: center; color: #64748b; padding: 20px 0; }
+        /* 底侧展示及仓库样式 */
+        .section-title { font-size: 1.5rem; margin-bottom: 20px; color: #9ca3af; border-left: 4px solid #f59e0b; padding-left: 10px; width: 100%; max-width: 1000px; }
+        .grid-container { display: flex; flex-wrap: wrap; gap: 15px; width: 100%; max-width: 1000px; margin-bottom: 40px; justify-content: center; }
         
-        .admin-trigger-btn { position: fixed; bottom: 20px; right: 20px; background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(0, 242, 254, 0.3); color: #00f2fe; padding: 10px 16px; border-radius: 30px; font-size: 14px; z-index: 999; }
-        .admin-panel-mask { display: none; position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center; }
-        .admin-box { background: #1e293b; border: 2px solid #00f2fe; border-radius: 20px; padding: 25px; width: 90%; max-width: 450px; color: #f8fafc; }
-        .admin-form-group { margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
-        .admin-form-group input { background: #0f172a; border: 1px solid #475569; color: #fff; padding: 6px 10px; border-radius: 8px; width: 140px; text-align: center; }
-        .admin-btn-group { margin-top: 20px; display: flex; gap: 10px; }
-        .admin-btn { flex: 1; padding: 10px; border-radius: 10px; }
-        .admin-save { background: #00f2fe; color: #0f172a; }
-        .admin-close { background: #475569; color: #fff; }
-        @media(max-width:900px){ .container { grid-template-columns: 1fr; } }
+        .bag-item {
+            background: #1f2937;
+            width: 230px;
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid #374151;
+        }
+
+        .bag-item-left { display: flex; align-items: center; gap: 10px; }
+        .bag-item-img { width: 50px; height: 50px; object-fit: contain; }
+        .sell-btn { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .sell-btn:hover { background: #dc2626; }
+        .empty { color: #6b7280; font-style: italic; font-size: 1.1rem; padding: 20px; }
     </style>
 </head>
-
 <body>
 
-<h1>🌟 Power Go 🌟</h1>
+    <header>
+        <h1>宝可梦爆裂抽卡系统</h1>
+        <p>纯粹绝对爆率 · 拒绝虚假保底</p>
+    </header>
 
-<div class="top-bar">
-    <div class="gold-box">💰 总金币资产：<span id="gold">5000</span></div>
-</div>
-
-<div class="container">
-    <div class="panel">
-        <h2>🎴 钛金抽卡控制大厅</h2>
-
-        <div class="gacha-buttons">
-            <button class="gacha-btn single" onclick="tryDraw(1)">单抽（100金币）</button>
-            <button class="gacha-btn ten" onclick="tryDraw(10)">十连抽（1000金币）</button>
-        </div>
-
-        <div class="rate-board">
-            <h3>📢 概率公示</h3>
-            <div>N 普通：86%（出售 <span id="label-N">10</span> 金币）</div>
-            <div>R 稀有：10%（出售 <span id="label-R">80</span> 金币）</div>
-            <div>SR 超稀有：2.5%（出售 <span id="label-SR">800</span> 金币）</div>
-            <div style="color:#fbbf24; font-weight: bold;">SSR 传说：1.5%（出售 <span id="label-SSR">3500</span> 金币）</div>
-        </div>
-
-        <div class="result-title">✨ 本轮所得卡牌清单</div>
-        <div id="resultArea" class="card-grid"></div>
+    <div class="status-panel">
+        <div>我的金币: <span id="gold" class="gold-count">1000</span> 🪙</div>
     </div>
 
-    <div class="panel">
-        <div class="bag-title">🎒 精灵核心核心仓库</div>
-        <div id="inventory" class="inventory">
-            <div class="empty">暂无精灵</div>
-        </div>
-        <button class="sell-all" onclick="sellAll()">一键出售全部</button>
+    <div class="btn-container">
+        <button id="draw1" class="draw-btn btn-single" onclick="draw(1)">单抽 (10金币)</button>
+        <button id="draw10" class="draw-btn btn-ten" onclick="draw(10)">十连抽 (100金币)</button>
     </div>
-</div>
 
-<div id="packOverlay" class="pack-overlay">
-    <div id="packBooster" class="pack-booster" onclick="ripPack()">
-        <div class="pack-title-text">POKÉMON</div>
-        <div class="pack-logo">⚡</div>
-        <div class="pack-tip">👆 鼠标点击 或 划动拆包 👆</div>
+    <div class="section-title">本次抽卡结果</div>
+    <div id="result-grid" class="grid-container">
+        <div class="empty">暂无抽卡记录，点击上方按钮开始抽卡</div>
     </div>
-</div>
 
-<div id="showcardOverlay" class="showcard-overlay">
-    
-    <div id="ssrExplosionEngine" class="ssr-hyper-explosion"></div>
-
-    <div id="giantCard" class="giant-card">
-        </div>
-    
-    <button id="nextCardBtn" class="next-card-btn" onclick="showNextCardInQueue()">收入仓库 📋</button>
-</div>
-
-<button class="admin-trigger-btn" onclick="openAdmin()">⚙️ 后台管理</button>
-
-<div id="adminModal" class="admin-panel-mask">
-    <div class="admin-box">
-       <h3>⚙️ 核心数据修改面板</h3>
-<div class="admin-form-group"><label>修改当前总金币：</label><input type="number" id="input-gold" /></div>
-<div class="admin-form-group"><label>N级（普通）售价：</label><input type="number" id="input-price-N" /></div>
-<div class="admin-form-group"><label>R级（稀有）售价：</label><input type="number" id="input-price-R" /></div>
-<div class="admin-form-group"><label>SR级（超稀有）售价：</label><input type="number" id="input-price-SR" /></div>
-<div class="admin-form-group"><label>SSR级（传说）售价：</label><input type="number" id="input-price-SSR" /></div>
-<div class="admin-form-group"><label style="color:#eab308; font-weight:bold;">UR级（神话）售价：</label><input type="number" id="input-price-UR" /></div>
-            <button class="admin-btn admin-save" onclick="saveAdminData()">保存修改</button>
-            <button class="admin-btn admin-close" onclick="closeAdmin()">关闭</button>
-        </div>
+    <div class="section-title">我的卡牌仓库</div>
+    <div id="inventory" class="grid-container">
+        <div class="empty">仓库空空如也</div>
     </div>
-</div>
+
+    <div id="showcardOverlay">
+        <div id="giantCard" class="giant-card">
+            </div>
+        <button id="nextCardBtn" onclick="showNextCardInQueue()">下一张</button>
+    </div>
 
 <script>
-    const ADMIN_PASSWORD = "123456";
+    // 价格体系数据
+    let prices = localStorage.getItem("pg_prices") !== null ? JSON.parse(localStorage.getItem("pg_prices")) : {
+        "N": 10, "R": 80, "SR": 800, "SSR": 3500, "UR": 9999
+    };
 
-    let gold = localStorage.getItem("pg_gold") !== null ? parseInt(localStorage.getItem("pg_gold")) : 5000;
-   let prices = localStorage.getItem("pg_prices") !== null ? JSON.parse(localStorage.getItem("pg_prices")) : {
-    "N": 10, "R": 80, "SR": 800, "SSR": 3500, "UR": 9999
-};
+    // 🌟 全套 30 只高清正版卡池数据列表（对应图 35）
+    const monsters = [
+        // ========== N 级别：普通基础 (9种) ==========
+        { name: "妙蛙种子", rarity: "N", image: "https://asia.pokemon-card.com/hk/card-img/hk00008867.png" },
+        { name: "小火龙", rarity: "N", image: "https://asia.pokemon-card.com/hk/card-img/hk00004944.png" },
+        { name: "杰尼龟", rarity: "N", image: "https://asia.pokemon-card.com/hk/card-img/hk00004953.png" },
+        { name: "绿毛虫", rarity: "N", image: "https://asia.pokemon-card.com/hk/card-img/hk00008064.png" },
+        { name: "波波", rarity: "N", image: "https://asia.pokemon-card.com/hk/card-img/hk00008272.png" },
+        { name: "可达鸭", rarity: "N", image: "https://asia.pokemon-card.com/hk/card-img/hk00006323.png" },
+        { name: "呆呆兽", rarity: "N", image: "https://asia.pokemon-card.com/hk/card-img/hk00003010.png" },
+        { name: "小磁怪", rarity: "N", image: "https://asia.pokemon-card.com/hk/card-img/hk00006361.png" },
+        { name: "地鼠", rarity: "N", image: "https://asia.pokemon-card.com/hk/card-img/hk00003039.png" },
 
-const monsters = [
-    // ================= 【N 级别：普通基础】(9种) =================
-    { name: "妙蛙种子", rarity: "N", image: "https://asia.pokemon-card.com/hk/card-img/hk00008867.png" },
-    { name: "小火龙", rarity: "N", image: "https://asia.pokemon-card.com/hk/card-img/hk00004944.png" },
-    { name: "杰尼龟", rarity: "N", image: "https://asia.pokemon-card.com/hk/card-img/hk00004953.png" },
-    { name: "绿毛虫", rarity: "N", image: "https://asia.pokemon-card.com/hk/card-img/hk00008064.png" },
-    { name: "波波", rarity: "N", image: "https://asia.pokemon-card.com/hk/card-img/hk00008272.png" },
-    { name: "可达鸭", rarity: "N", image: "https://asia.pokemon-card.com/hk/card-img/hk00006323.png" },
-    { name: "呆呆兽", rarity: "N", image: "https://asia.pokemon-card.com/hk/card-img/hk00003010.png" },
-    { name: "小磁怪", rarity: "N", image: "https://asia.pokemon-card.com/hk/card-img/hk00006361.png" },
-    { name: "地鼠", rarity: "N", image: "https://asia.pokemon-card.com/hk/card-img/hk00003039.png" },
+        // ========== R 级别：稀有闪卡 (8种) ==========
+        { name: "比雕 (大比鸟)", rarity: "R", image: "https://asia.pokemon-card.com/hk/card-img/hk00003243.png" },
+        { name: "大针蜂", rarity: "R", image: "https://asia.pokemon-card.com/tw/card-img/tw00018423.png" },
+        { name: "胖丁", rarity: "R", image: "https://asia.pokemon-card.com/hk/card-img/hk00003028.png" },
+        { name: "九尾", rarity: "R", image: "https://asia.pokemon-card.com/hk/card-img/hk00004948.png" },
+        { name: "风速狗", rarity: "R", image: "https://asia.pokemon-card.com/hk/card-img/hk00003213.png" },
+        { name: "耿鬼", rarity: "R", image: "https://asia.pokemon-card.com/hk/card-img/hk00003222.png" },
+        { name: "暴鲤龙", rarity: "R", image: "https://asia.pokemon-card.com/hk/card-img/hk00004961.png" },
+        { name: "卡比兽", rarity: "R", image: "https://asia.pokemon-card.com/hk/card-img/hk00006450.png" },
 
-    // ================= 【R 级别：稀有闪卡】(8种) =================
-    { name: "比雕 (大比鸟)", rarity: "R", image: "https://asia.pokemon-card.com/hk/card-img/hk00003243.png" },
-    { name: "大针蜂", rarity: "R", image: "https://asia.pokemon-card.com/tw/card-img/tw00018423.png" },
-    { name: "胖丁", rarity: "R", image: "https://asia.pokemon-card.com/hk/card-img/hk00003028.png" },
-    { name: "九尾", rarity: "R", image: "https://asia.pokemon-card.com/hk/card-img/hk00004948.png" },
-    { name: "风速狗", rarity: "R", image: "https://asia.pokemon-card.com/hk/card-img/hk00003213.png" },
-    { name: "耿鬼", rarity: "R", image: "https://asia.pokemon-card.com/hk/card-img/hk00003222.png" },
-    { name: "暴鲤龙", rarity: "R", image: "https://asia.pokemon-card.com/hk/card-img/hk00004961.png" },
-    { name: "卡比兽", rarity: "R", image: "https://asia.pokemon-card.com/hk/card-img/hk00006450.png" },
+        // ========== SR 级别：超级稀有/强力进化 (6种) ==========
+        { name: "快龙 ex", rarity: "SR", image: "https://asia.pokemon-card.com/hk/card-img/hk00007886.png" },
+        { name: "巨金怪 ex", rarity: "SR", image: "https://asia.pokemon-card.com/hk/card-img/hk00007890.png" },
+        { name: "轰鸣月 ex", rarity: "SR", image: "https://asia.pokemon-card.com/hk/card-img/hk00007662.png" },
+        { name: "铁武者 ex", rarity: "SR", image: "https://asia.pokemon-card.com/hk/card-img/hk00007641.png" },
+        { name: "班基拉斯 ex", rarity: "SR", image: "https://asia.pokemon-card.com/hk/card-img/hk00007135.png" },
+        { name: "赛富豪 ex", rarity: "SR", image: "https://asia.pokemon-card.com/hk/card-img/hk00004245.png" },
 
-    // ================= 【SR 级别：超级稀有/强力进化】(6种) =================
-    { name: "快龙 ex", rarity: "SR", image: "https://asia.pokemon-card.com/hk/card-img/hk00007886.png" },
-    { name: "巨金怪 ex", rarity: "SR", image: "https://asia.pokemon-card.com/hk/card-img/hk00007890.png" },
-    { name: "轰鸣月 ex", rarity: "SR", image: "https://asia.pokemon-card.com/hk/card-img/hk00007662.png" },
-    { name: "铁武者 ex", rarity: "SR", image: "https://asia.pokemon-card.com/hk/card-img/hk00007641.png" },
-    { name: "班基拉斯 ex", rarity: "SR", image: "https://asia.pokemon-card.com/hk/card-img/hk00007135.png" },
-    { name: "索罗亚克", rarity: "SR", image: "https://asia.pokemon-card.com/hk/card-img/hk00004245.png" },
+        // ========== SSR 级别：传说特写/爆率狂欢 (5种) ==========
+        { name: "喷火龙 ex", rarity: "SSR", image: "https://q7.itc.cn/images01/20211028/5ebb6de3597743ef9dda4adb8a27406b.png" },
+        { name: "皮卡丘 ex", rarity: "SSR", image: "https://asia.pokemon-card.com/tw/card-img/tw00018367.png" },
+        { name: "甲贺忍蛙 ex", rarity: "SSR", image: "https://asia.pokemon-card.com/hk/card-img/hk00008518.png" },
+        { name: "超梦 ex", rarity: "SSR", image: "https://asia.pokemon-card.com/hk/card-img/hk00008119.png" },
+        { name: "烈空坐", rarity: "SSR", image: "https://asia.pokemon-card.com/hk/card-img/hk00004381.png" },
 
-    // ================= 【SSR 级别：传说特写/爆率狂欢】(5种) =================
-    { name: "喷火龙 ex", rarity: "SSR", image: "https://q7.itc.cn/images01/20241028/5ebb6de3597743ef9dda4adb8a27406b.png" },
-    { name: "皮卡丘 ex", rarity: "SSR", image: "https://asia.pokemon-card.com/tw/card-img/tw00018367.png" },
-    { name: "甲贺忍蛙 ex", rarity: "SSR", image: "https://asia.pokemon-card.com/hk/card-img/hk00008518.png" },
-    { name: "超梦 ex", rarity: "SSR", image: "https://asia.pokemon-card.com/hk/card-img/hk00008119.png" },
-    { name: "烈空坐", rarity: "SSR", image: "https://asia.pokemon-card.com/hk/card-img/hk00004381.png" },
+        // ========== UR 级别：金色终极神话 (2种) ==========
+        { name: "金色·阿尔宙斯 VSTAR", rarity: "UR", image: "https://asia.pokemon-card.com/tw/card-img/tw00047244.png" },
+        { name: "金色·骑拉帝纳 VSTAR", rarity: "UR", image: "https://asia.pokemon-card.com/tw/card-img/tw00006201.png" }
+    ];
 
-    // ================= 【UR 级别：金色终极神话】(2种) =================
-    { name: "金色·阿尔宙斯 VSTAR", rarity: "UR", image: "https://asia.pokemon-card.com/tw/card-img/tw00004724.png" },
-    { name: "金色·骑拉帝纳 VSTAR", rarity: "UR", image: "https://asia.pokemon-card.com/tw/card-img/tw00006201.png" }
-];
-
-    let pendingDrawCount = 0;
-    let cardQueue = []; 
+    let gold = localStorage.getItem("pg_gold") !== null ? parseInt(localStorage.getItem("pg_gold")) : 1000;
+    let inventory = localStorage.getItem("pg_inventory") !== null ? JSON.parse(localStorage.getItem("pg_inventory")) : [];
+    let latestDrawResult = [];
+    let cardQueue = [];
     let currentQueueIndex = 0;
 
-    function saveDataToStorage() {
-        localStorage.setItem("pg_gold", gold);
-        localStorage.setItem("pg_prices", JSON.stringify(prices));
-        localStorage.setItem("pg_inventory", JSON.stringify(inventory));
+    // 初始化加载
+    window.onload = function() {
+        updateGold();
+        renderInventory();
+    };
+
+    function updateGold() {
+        document.getElementById("gold").innerText = gold;
     }
 
-    function updateGold() { document.getElementById("gold").innerText = gold; }
-    function updatePriceLabels() {
-        document.getElementById("label-N").innerText = prices["N"];
-        document.getElementById("label-R").innerText = prices["R"];
-        document.getElementById("label-SR").innerText = prices["SR"];
-        document.getElementById("label-SSR").innerText = prices["SSR"];
-    }
-
-   function getRandomMonster() {
-    const rand = Math.random() * 100;
-    let rarity = "N";
-    
-    if (rand < 75) rarity = "N";          // 75% 爆率
-    else if (rand < 90) rarity = "R";     // 15% 爆率
-    else if (rand < 97) rarity = "SR";    // 7% 爆率
-    else if (rand < 99.7) rarity = "SSR"; // 2.7% 爆率（触发全屏金色炸裂特效！）
-    else rarity = "UR";                  // 0.3% 爆率（抽中极为罕见的纯金 UR 终极神卡！）
-
-    const pool = monsters.filter(m => m.rarity === rarity);
-    const selected = pool[Math.floor(Math.random() * pool.length)];
-    return { name: selected.name, rarity: selected.rarity, image: selected.image, sell: prices[selected.rarity] };
-}
-    function tryDraw(count) {
-        const cost = count === 1 ? 100 : 1000;
-        if (gold < cost) { alert("金币不足"); return; }
+    // 核心抽卡池算法（纯粹概率）
+    function draw(times) {
+        const cost = times * 10;
+        if (gold < cost) {
+            alert("🪙 金币不足，快去出售旧卡牌换取金币吧！");
+            return;
+        }
 
         gold -= cost;
         updateGold();
-        saveDataToStorage();
 
-        pendingDrawCount = count;
-        
-        const packBooster = document.getElementById("packBooster");
-        packBooster.classList.remove("torn");
-        document.getElementById("packOverlay").style.display = "flex";
-    }
-
-    function ripPack() {
-        if (pendingDrawCount === 0) return;
-        const packBooster = document.getElementById("packBooster");
-        packBooster.classList.add("torn");
-
-        setTimeout(() => {
-            document.getElementById("packOverlay").style.display = "none";
-            generateGachaResults(pendingDrawCount);
-        }, 350);
-    }
-
-    function generateGachaResults(count) {
+        latestDrawResult = [];
         cardQueue = [];
-        currentQueueIndex = 0;
 
-        for (let i = 0; i < count; i++) {
-            const monster = getRandomMonster();
-            cardQueue.push(monster);
-            inventory.push(monster); 
+        for (let i = 0; i < times; i++) {
+            let roll = Math.random() * 100;
+            let selectedRarity = "N";
+
+            // 爆率分配：UR 0.3%, SSR 2.7%, SR 12%, R 25%, N 60%
+            if (roll < 0.3) selectedRarity = "UR";
+            else if (roll < 3.0) selectedRarity = "SSR";
+            else if (roll < 15.0) selectedRarity = "SR";
+            else if (roll < 40.0) selectedRarity = "R";
+            else selectedRarity = "N";
+
+            // 从选中的稀有度池子里随机抓一只
+            let pool = monsters.filter(m => m.rarity === selectedRarity);
+            let rolledMonster = pool[Math.floor(Math.random() * pool.length)];
+
+            latestDrawResult.push(rolledMonster);
+            cardQueue.push(rolledMonster);
+            inventory.push({ ...rolledMonster, sell: prices[rolledMonster.rarity] });
         }
 
+        currentQueueIndex = 0;
         document.getElementById("showcardOverlay").style.display = "flex";
         showNextCardInQueue();
     }
 
+    // 🌟 翻卡大本营逻辑（对应图 29 与 图 31）
     function showNextCardInQueue() {
         const giantCard = document.getElementById("giantCard");
         const stage = document.getElementById("showcardOverlay");
-        
+
         giantCard.classList.remove("pop-up");
-        stage.classList.remove("ssr-stage");
-        stopSSRBlastEffects();
 
         if (currentQueueIndex >= cardQueue.length) {
             stage.style.display = "none";
@@ -618,201 +331,121 @@ const monsters = [
 
         const monster = cardQueue[currentQueueIndex];
         const btn = document.getElementById("nextCardBtn");
-        
+
         if (currentQueueIndex === cardQueue.length - 1) {
-            btn.innerText = "收入仓库 📋";
+            btn.innerText = "收入仓库 🎒";
         } else {
             btn.innerText = `下一张 (${currentQueueIndex + 1}/${cardQueue.length}) ➡️`;
         }
 
-     setTimeout(() => {
-        giantCard.className = `giant-card g-${monster.rarity}`;
-        giantCard.innerHTML = `
-            <div class="giant-rarity">${monster.rarity}</div>
-            <img src="${monster.image}">
-            <div>
-                <div class="giant-name">${monster.name}</div>
-        `;
-
-        giantCard.classList.add("pop-up");
-
-        // 触发终极 SSR 金光辐射特效
-        if (monster.rarity === "SSR") {
-            stage.classList.add("ssr-stage");
-            triggerSSRBlastEffects();
-        }
-
-        currentQueueIndex++;
-
-        // 🌟 【完美位置】在这里引爆你的大厂全屏震动与横幅特效！
-        applyHighEndEffects(monster.rarity);
-
-    }, 150);
-
-    // 🚀 【全新实现】动态生成中心向外喷射光束的代码逻辑 🚀
-    function triggerSSRBlastEffects() {
-        const engine = document.getElementById("ssrExplosionEngine");
-        engine.innerHTML = "";
-        engine.style.display = "block";
-
-        // 生成放射极光束
-        const rayCount = 45; 
-        for (let i = 0; i < rayCount; i++) {
-            const ray = document.createElement("div");
-            ray.className = "ray";
-            const angle = (360 / rayCount) * i + (Math.random() * 5); // 均匀散射角度
-            ray.style.setProperty("--angle", `${angle}deg`);
-            
-            // 随机微调每条金光的射出速度与延时，营造极光冲击层次感
-            const duration = Math.random() * 0.8 + 0.6;
-            const delay = Math.random() * 0.4;
-            ray.style.animation = `rayBlast ${duration}s linear ${delay}s infinite`;
-            
-            engine.appendChild(ray);
-        }
-
-        // 生成往外飞溅的碎金光斑粒子
-        const particleCount = 30;
-        for (let i = 0; i < particleCount; i++) {
-            const spark = document.createElement("div");
-            spark.className = "sparkle";
-            const angle = Math.random() * 360;
-            spark.style.setProperty("--angle", `${angle}deg`);
-            
-            const size = Math.random() * 12 + 6;
-            spark.style.width = size + "px";
-            spark.style.height = size + "px";
-            
-            const duration = Math.random() * 0.7 + 0.5;
-            const delay = Math.random() * 0.5;
-            spark.style.animation = `sparkleBlast ${duration}s ease-out ${delay}s infinite`;
-            
-            engine.appendChild(spark);
-        }
-    }
-
-    function stopSSRBlastEffects() {
-        const engine = document.getElementById("ssrExplosionEngine");
-        engine.style.display = "none";
-        engine.innerHTML = "";
-    }
-
-    function renderBottomResultGrid() {
-        const resultArea = document.getElementById("resultArea");
-        resultArea.innerHTML = ""; 
-
-        cardQueue.forEach(monster => {
-            const staticCard = document.createElement("div");
-            staticCard.className = "static-card";
-            
-            let color = "#fff";
-            if (monster.rarity === "R") color = "#38bdf8";
-            if (monster.rarity === "SR") color = "#c084fc";
-            if (monster.rarity === "SSR") color = "#fbbf24";
-
-            staticCard.innerHTML = `
+        setTimeout(() => {
+            // 对齐最新的 CSS 暗号类名
+            giantCard.className = `giant-card g-${monster.rarity}`;
+            giantCard.innerHTML = `
+                <div class="giant-rarity">${monster.rarity}</div>
                 <img src="${monster.image}">
-                <div class="c-name" style="color: ${color}">${monster.name}</div>
-                <div class="c-rarity" style="color: ${color}">${monster.rarity}</div>
+                <div>
+                    <div class="giant-name">${monster.name}</div>
+                </div>
             `;
-            resultArea.appendChild(staticCard);
-        });
+
+            giantCard.classList.add("pop-up");
+
+            currentQueueIndex++;
+
+            // 🌟 精准触发大厂级特效触发器
+            applyHighEndEffects(monster.rarity);
+
+        }, 150);
     }
 
-    function renderInventory() {
-        const inventoryDiv = document.getElementById("inventory");
-        if (inventory.length === 0) { inventoryDiv.innerHTML = `<div class="empty">仓库空空如也</div>`; return; }
-        inventoryDiv.innerHTML = "";
-        inventory.forEach((monster, index) => {
+    // 渲染本次抽取的底侧网格结果
+    function renderBottomResultGrid() {
+        const grid = document.getElementById("result-grid");
+        grid.innerHTML = "";
+        latestDrawResult.forEach(monster => {
             const item = document.createElement("div");
-            item.className = "bag-item";
+            item.className = `bag-item g-${monster.rarity}`;
             item.innerHTML = `
                 <div class="bag-item-left">
                     <img class="bag-item-img" src="${monster.image}">
                     <div>
-                        <strong>${monster.name}</strong>
-                        <span style="color:${monster.rarity === 'SSR' ? '#fbbf24' : '#fff'}">(${monster.rarity})</span>
+                        <strong>${monster.name}</strong><br>
+                        <span style="color:${monster.rarity === 'UR'?'#eab308':(monster.rarity === 'SSR'?'#fbbf24':'#fff')}">${monster.rarity}</span>
                     </div>
                 </div>
-                <button class="sell-btn" onclick="sellOne(${index})">出售 +${monster.sell}</button>
             `;
-            inventoryDiv.appendChild(item);
+            grid.appendChild(item);
         });
     }
 
+    // 🌟 渲染我的卡牌仓库列表（包含卖出按钮，对应图 39）
+    function renderInventory() {
+        const container = document.getElementById("inventory");
+        if (inventory.length === 0) {
+            container.innerHTML = `<div class="empty">仓库空空如也</div>`;
+            return;
+        }
+        container.innerHTML = "";
+        inventory.forEach((monster, index) => {
+            const item = document.createElement("div");
+            item.className = `bag-item g-${monster.rarity}`;
+            item.innerHTML = `
+                <div class="bag-item-left">
+                    <img class="bag-item-img" src="${monster.image}">
+                    <div>
+                        <strong>${monster.name}</strong><br>
+                        <span style="color:${monster.rarity === 'UR'?'#eab308':(monster.rarity === 'SSR'?'#fbbf24':'#fff')}">(${monster.rarity})</span>
+                    </div>
+                </div>
+                <button class="sell-btn" onclick="sellOne(${index})">+${monster.sell}</button>
+            `;
+            container.appendChild(item);
+        });
+    }
+
+    // 卖出一张卡牌
     function sellOne(index) {
         gold += inventory[index].sell;
         inventory.splice(index, 1);
-        updateGold(); renderInventory(); saveDataToStorage();
+        updateGold();
+        renderInventory();
+        saveDataToStorage();
     }
 
-    function sellAll() {
-        if (inventory.length === 0) { alert("仓库是空的"); return; }
-        let total = 0;
-        inventory.forEach(m => { total += m.sell; });
-        gold += total; inventory = [];
-        updateGold(); renderInventory(); saveDataToStorage();
-        alert("成功将仓库内全部精灵出售，获得 " + total + " 金币！");
+    // 保存本地数据
+    function saveDataToStorage() {
+        localStorage.setItem("pg_gold", gold);
+        localStorage.setItem("pg_inventory", JSON.stringify(inventory));
     }
 
-    function openAdmin() {
-        const psw = prompt("请输入后台管理密码：");
-        if (psw === ADMIN_PASSWORD) {
-            document.getElementById("input-gold").value = gold;
-            document.getElementById("input-price-N").value = prices["N"];
-            document.getElementById("input-price-R").value = prices["R"];
-            document.getElementById("input-price-SR").value = prices["SR"];
-            document.getElementById("input-price-SSR").value = prices["SSR"];
-            document.getElementById("adminModal").style.display = "flex";
-        } else if (psw !== null) { alert("密码错误，拒绝访问！"); }
+    // ==================== 👑 全屏视觉大厂高档特效触发器 👑 ====================
+    function applyHighEndEffects(rarity) {
+        // 每次翻卡前，干净清除上一次的震动状态
+        document.body.classList.remove("screen-shake");
+
+        if (rarity === "UR") {
+            // 0.3% 究极神话出货！瞬间激活全屏剧烈物理震动
+            setTimeout(() => document.body.classList.add("screen-shake"), 5);
+            
+            // 屏幕上方凌空砸下一道写着【金色神话横幅】
+            let urBanner = document.createElement("div");
+            urBanner.innerHTML = "✨ 👑 究极神话 UR 诞生 👑 ✨";
+            urBanner.style = "position:fixed; top:15%; left:50%; transform:translate(-50%,-50%); color:#eab308; font-size:42px; font-weight:bold; text-shadow:0 0 25px #eab308, 0 0 5px #fff; z-index:99999; text-align:center; width:100%; pointer-events:none; font-family:'Microsoft YaHei',sans-serif;";
+            document.body.appendChild(urBanner);
+            
+            // 狂震 2.5 秒后，自动消失，并恢复平静
+            setTimeout(() => { urBanner.remove(); document.body.classList.remove("screen-shake"); }, 2500);
+        } 
+        else if (rarity === "SSR") {
+            // 2.7% 传说出货！拉起金光横幅
+            let ssrBanner = document.createElement("div");
+            ssrBanner.innerHTML = "🌟 传说级 SSR 出货 🌟";
+            ssrBanner.style = "position:fixed; top:15%; left:50%; transform:translate(-50%,-50%); color:#fbbf24; font-size:32px; font-weight:bold; text-shadow:0 0 15px #fbbf24; z-index:99999; text-align:center; width:100%; pointer-events:none; font-family:'Microsoft YaHei',sans-serif;";
+            document.body.appendChild(ssrBanner);
+            setTimeout(() => ssrBanner.remove(), 2000);
+        }
     }
-    function closeAdmin() { document.getElementById("adminModal").style.display = "none"; }
-
-    function saveAdminData() {
-        const newGold = parseInt(document.getElementById("input-gold").value);
-        const newN = parseInt(document.getElementById("input-price-N").value);
-        const newR = parseInt(document.getElementById("input-price-R").value);
-        const newSR = parseInt(document.getElementById("input-price-SR").value);
-        const newSSR = parseInt(document.getElementById("input-price-SSR").value);
-        if (isNaN(newGold) || isNaN(newN) || isNaN(newR) || isNaN(newSR) || isNaN(newSSR)) { alert("请输入合法的数字！"); return; }
-        gold = newGold; prices["N"] = newN; prices["R"] = newR; prices["SR"] = newSR; prices["SSR"] = newSSR;
-        inventory.forEach(m => { if (prices[m.rarity]) m.sell = prices[m.rarity]; });
-        updateGold(); updatePriceLabels(); renderInventory(); saveDataToStorage();
-        alert("后台修改成功并已保存！"); closeAdmin();
-    }
-
-    updateGold(); updatePriceLabels(); renderInventory();
-
-        // ==================== 👑 全屏视觉大厂高档特效触发器 👑 ====================
-function applyHighEndEffects(rarity) {
-    // 每次翻卡前，利落地清除上一次的横幅和震动状态
-    document.body.classList.remove("screen-shake");
-
-    if (rarity === "UR") {
-        // 0.3% 究极神话出货！瞬间激活全屏剧烈碎裂震动
-        setTimeout(() => document.body.classList.add("screen-shake"), 5);
-        
-        // 屏幕上方凌空砸下一道亮瞎眼的【全息金色神话大横幅】
-        let urBanner = document.createElement("div");
-        urBanner.innerHTML = "✨ 👑 究极神话 UR 诞生 👑 ✨";
-        urBanner.style = "position:fixed; top:15%; left:50%; transform:translate(-50%,-50%); color:#eab308; font-size:42px; font-weight:bold; text-shadow:0 0 25px #eab308, 0 0 5px #fff; z-index:99999; text-align:center; width:100%; pointer-events:none; font-family:'Microsoft YaHei',sans-serif; animation: urGlow 0.5s infinite alternate;";
-        document.body.appendChild(urBanner);
-        
-        // 狂震 2.5 秒后，横幅消失，屏幕恢复平静
-        setTimeout(() => { urBanner.remove(); document.body.classList.remove("screen-shake"); }, 2500);
-    } 
-    else if (rarity === "SSR") {
-        // 2.7% 传说出货！在屏幕上方拉起一道金光闪闪的炫酷横幅
-        let ssrBanner = document.createElement("div");
-        ssrBanner.innerHTML = "🌟 传说级 SSR 出货 🌟";
-        ssrBanner.style = "position:fixed; top:15%; left:50%; transform:translate(-50%,-50%); color:#fbbf24; font-size:32px; font-weight:bold; text-shadow:0 0 15px #fbbf24; z-index:99999; text-align:center; width:100%; pointer-events:none; font-family:'Microsoft YaHei',sans-serif;";
-        document.body.appendChild(ssrBanner);
-        setTimeout(() => ssrBanner.remove(), 2000);
-    }
-}
 </script>
 </body>
-
-    
 </html>
-
