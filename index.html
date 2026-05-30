@@ -6,1099 +6,711 @@
     <title>🌟 Power Go Premium 4.7 爆率+回收双控商用版 🌟</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        /* ==================== 👑 全局变量与手机端适配重构 👑 ==================== */
+        /* ==================== 🎨 核心 UI 样式表 ==================== */
         :root {
-            --bg-main: #0f111a;
-            --bg-card: #1a1c29;
-            --primary: #26e6e6;
-            --color-n: #94a3b8;
-            --color-r: #3b82f6;
-            --color-sr: #a855f7;
-            --color-ssr: #fbbf24;
-            --color-ur: #ef4444;
+            --color-ur: #ff3e3e; --color-ssr: #ffa500; --color-sr: #a020f0; --color-r: #00c0ff; --color-n: #aaaaaa;
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-main);
-            color: white;
-            padding-bottom: 75px; 
-            overflow-x: hidden;
+            margin: 0; background: #0b0e14; color: #f5f6f7; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; user-select: none; -webkit-tap-highlight-color: transparent;
         }
-
-        /* 👑 智能流线型 Header */
-        .header-bar {
-            background: #161925;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            border-bottom: 1px solid #232838;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
+        .header {
+            display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: #121620; border-bottom: 1px solid #1e2538; position: sticky; top: 0; z-index: 100;
         }
-
-        .header-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-        }
-
-        .brand-title {
-            font-size: 24px;
-            font-weight: 900;
-            color: var(--primary);
-            text-shadow: 0 0 10px rgba(38,230,230,0.3);
-            letter-spacing: 1px;
-        }
-
-        .gold-badge {
-            background: linear-gradient(135deg, #ffd700, #b48a00);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 14px;
-            box-shadow: 0 3px 10px rgba(180,138,0,0.3);
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        /* 🔍 搜索框样式 */
-        .search-container {
-            position: relative;
-            width: 100%;
-        }
-
-        .search-bar {
-            width: 100%;
-            background: #0b0d14;
-            border: 1px solid #2a2e45;
-            border-radius: 10px;
-            padding: 11px 12px 11px 38px;
-            color: white;
-            font-size: 14px;
-            transition: all 0.3s;
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #64748b;
-            font-size: 14px;
-        }
-
-        /* 🏷️ IP分区横向滑动导航 */
-        .category-scroll {
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            padding: 5px 0;
-            width: 100%;
-        }
-        .category-scroll::-webkit-scrollbar { display: none; } 
-
-        .category-tag {
-            white-space: nowrap;
-            background: #1e2235;
-            color: #94a3b8;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: 1px solid transparent;
-        }
-        .category-tag.active {
-            background: rgba(38, 230, 230, 0.15);
-            color: var(--primary);
-            border-color: var(--primary);
-        }
-
-        /* 主体内容视图区 */
-        .view-section {
-            display: none;
-            padding: 15px;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .view-section.active {
-            display: block;
-        }
-
-        /* ==================== 🎴 潮玩大厅样式 ==================== */
-        .pack-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-top: 10px;
-        }
-
-        @media (max-width: 480px) {
-            .pack-grid { grid-template-columns: 1fr; }
-        }
-
-        .pack-card {
-            background: var(--bg-card);
-            border-radius: 16px;
-            border: 1px solid #2a2e45;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            transition: transform 0.2s;
-        }
-
-        .pack-banner {
-            width: 100%;
-            height: 180px;
-            object-fit: cover;
-            background: #11131e;
-            cursor: pointer;
-            display: block;
-        }
-
-        .pack-info {
-            padding: 15px;
-        }
-
-        .pack-name {
-            font-size: 17px;
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #f1f5f9;
-        }
-
-        .pack-tag {
-            font-size: 12px;
-            color: var(--primary);
-            font-weight: 500;
-        }
-
-        /* ==================== 🚪 全屏二级卡包详情弹窗 ==================== */
-        #detailOverlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-main);
-            z-index: 2000;
-            display: none;
-            flex-direction: column;
-            overflow-y: auto;
-        }
-
-        .detail-header {
-            padding: 15px 20px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            border-bottom: 1px solid #232838;
-            background: #161925;
-            position: sticky; top: 0; z-index: 10;
-        }
-
-        .back-btn { font-size: 22px; cursor: pointer; color: var(--primary); padding: 5px; }
-
-        .detail-content {
-            padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 20px;
-            max-width: 500px; margin: 0 auto; width: 100%;
-        }
-
-        .detail-banner-img {
-            width: 100%; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); border: 1px solid #2a2e45;
-        }
-
-        .detail-intro {
-            width: 100%; background: var(--bg-card); border-radius: 12px; padding: 15px;
-            border: 1px solid #232838; font-size: 14px; line-height: 1.6; color: #94a3b8;
-        }
-
-        .detail-actions { width: 100%; display: flex; flex-direction: column; gap: 12px; }
-
-        .action-big-btn {
-            width: 100%; padding: 15px; border-radius: 12px; border: none; font-size: 16px;
-            font-weight: bold; color: white; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px;
-        }
-        .btn-single { background: linear-gradient(180deg, #0284c7, #0369a1); }
-        .btn-ten { background: linear-gradient(180deg, #f97316, #ea580c); }
-
-        /* ==================== 🎒 核心智能仓库样式 ==================== */
-        .warehouse-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .clear-btn { background: linear-gradient(135deg, #f43f5e, #be123c); color: white; border: none; padding: 8px 16px; border-radius: 20px; font-weight: bold; font-size: 13px; }
-
-        .warehouse-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-        @media (min-width: 600px) { .warehouse-grid { grid-template-columns: repeat(3, 1fr); } }
-
-        .bag-item {
-            background: var(--bg-card); border-radius: 12px; padding: 10px; border: 1px solid #282d42;
-            display: flex; flex-direction: column; align-items: center; position: relative;
-        }
-
-        .bag-item-img { width: 100%; height: 140px; object-fit: contain; border-radius: 8px; background: #0b0d14; padding: 5px; }
-        .bag-item-name { font-size: 14px; font-weight: bold; margin-top: 8px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
-        .bag-item-rarity { font-size: 11px; font-weight: 900; margin: 2px 0 8px 0; font-style: italic; }
-        .cell-action-btn { width: 100%; padding: 6px; border: none; border-radius: 6px; background: #334155; color: #f1f5f9; font-size: 12px; font-weight: bold; cursor: pointer; }
-
-        /* 稀有度框线 */
-        .border-N { border-color: var(--color-n); }
-        .border-R { border-color: var(--color-r); box-shadow: 0 0 8px rgba(59,130,246,0.2); }
-        .border-SR { border-color: var(--color-sr); box-shadow: 0 0 12px rgba(168,85,247,0.4); }
-        .border-SSR { border-color: var(--color-ssr); box-shadow: 0 0 16px rgba(251,191,36,0.6); }
-        .border-UR { border-color: var(--color-ur); box-shadow: 0 0 20px rgba(239,68,68,0.8); animation: pulseUR 1.5s infinite alternate; }
-
-        @keyframes pulseUR { 0% { transform: scale(1); } 100% { transform: scale(1.02); filter: brightness(1.1); } }
-
-        /* ==================== 🔑 密码验证锁定面板 ==================== */
-        .lock-container {
-            background: var(--bg-card);
-            border-radius: 16px;
-            padding: 30px 20px;
-            border: 1px solid #2a2e45;
-            text-align: center;
-            max-width: 400px;
-            margin: 40px auto;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            display: block; 
-        }
-        .lock-title { font-size: 18px; font-weight: bold; color: var(--color-ur); margin-bottom: 10px; }
-        .lock-tip { font-size: 13px; color: #64748b; margin-bottom: 20px; }
-
-        /* ==================== 🛠️ 可视化高级配置后台管理系统 ==================== */
-        .admin-real-content { display: none; } 
-        .admin-section { background: #161925; padding: 15px; border-radius: 12px; border: 1px solid #2d3446; margin-bottom: 20px; }
-        .admin-section-title { font-size: 16px; font-weight: bold; color: var(--primary); margin-bottom: 12px; border-left: 4px solid var(--primary); padding-left: 8px; }
-        .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
-        .form-group label { font-size: 12px; color: #94a3b8; }
-        .form-control { background: #0b0d14; border: 1px solid #2a2e45; border-radius: 6px; padding: 10px; color: white; font-size: 14px; }
-        .admin-row { display: flex; gap: 10px; }
-        .admin-row .form-group { flex: 1; }
-        .admin-btn { background: linear-gradient(135deg, #06b6d4, #0891b2); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; width: 100%; }
+        .logo { font-size: 22px; font-weight: 900; background: linear-gradient(90deg, #00dbde, #fc00ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .gold-badge { background: linear-gradient(135deg, #ffd700, #ffa500); color: #000; padding: 6px 14px; border-radius: 20px; font-weight: bold; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 10px rgba(255,165,0,0.3); }
+        .search-box { padding: 10px 20px; background: #121620; }
+        .search-inner { position: relative; }
+        .search-inner i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #64748b; }
+        .search-inner input { width: 100%; box-sizing: border-box; padding: 10px 12px 10px 38px; background: #1e2538; border: 1px solid #2d3748; border-radius: 8px; color: #fff; font-size: 14px; }
+        .tabs-bar { display: flex; gap: 10px; padding: 10px 20px; overflow-x: auto; white-space: nowrap; }
+        .tab-btn { padding: 6px 16px; background: #1e2538; border: 1px solid #2d3748; border-radius: 20px; color: #94a3b8; font-size: 13px; cursor: pointer; }
+        .tab-btn.active { background: #00dbde; color: #000; font-weight: bold; border-color: #00dbde; }
+        .section-title { padding: 15px 20px 5px; font-size: 16px; font-weight: bold; display: flex; align-items: center; gap: 8px; }
+        .market-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 15px 20px; }
+        .pack-card { background: #1e2538; border: 1px solid #2d3748; border-radius: 12px; overflow: hidden; position: relative; transition: transform 0.2s; }
+        .pack-card:active { transform: scale(0.97); }
+        .pack-banner { width: 100%; height: 100px; object-fit: cover; background: #2d3748; }
+        .pack-info { padding: 10px; }
+        .pack-title { font-size: 14px; font-weight: bold; margin-bottom: 4px; }
+        .pack-cost { font-size: 12px; color: #ffd700; display: flex; align-items: center; gap: 4px; }
+        .pack-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 0 10px 10px; }
+        .draw-btn { padding: 8px 0; border: none; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; color: #fff; background: linear-gradient(135deg, #2563eb, #1d4ed8); }
+        .draw-btn.btn-10 { background: linear-gradient(135deg, #7c3aed, #6d28d9); }
         
-        .pack-selector { background: #0b0d14; border: 1px solid #2a2e45; color: white; padding: 10px; border-radius: 6px; width: 100%; margin-bottom: 15px; font-weight: bold; }
-        .pool-preview-list { display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto; background: #0b0d14; padding: 10px; border-radius: 6px; border: 1px solid #2a2e45; }
-        .pool-preview-item { display: flex; justify-content: space-between; font-size: 12px; padding: 6px; border-bottom: 1px solid #1e2235; }
+        /* 仓库样式 */
+        .warehouse-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(95px, 1fr)); gap: 10px; padding: 15px 20px; }
+        .bag-item { background: #161b26; border: 1px solid #2d3748; border-radius: 8px; padding: 8px; text-align: center; position: relative; }
+        .bag-item img { width: 100%; height: 80px; object-fit: contain; border-radius: 4px; background: #1e2538; }
+        .bag-name { font-size: 11px; margin-top: 5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .bag-rarity { font-size: 10px; font-weight: bold; margin-top: 2px; }
+        .bag-price { font-size: 10px; color: #ffd700; margin-top: 3px; }
+        .recycle-btn { margin-top: 6px; width: 100%; padding: 4px 0; font-size: 10px; border: none; background: #ef4444; color: #fff; border-radius: 4px; cursor: pointer; }
+        .empty-tips { grid-column: 1/-1; text-align: center; color: #64748b; padding: 4px 0; font-size: 14px; margin: 40px auto; }
+        
+        /* 稀有度边框及文字色 */
+        .border-UR { border-color: var(--color-ur) !important; box-shadow: inset 0 0 10px rgba(255,62,62,0.3); }
+        .border-SSR { border-color: var(--color-ssr) !important; box-shadow: inset 0 0 10px rgba(255,165,0,0.3); }
+        .border-SR { border-color: var(--color-sr) !important; box-shadow: inset 0 0 10px rgba(160,32,240,0.3); }
+        .border-R { border-color: var(--color-r) !important; box-shadow: inset 0 0 10px rgba(0,192,255,0.3); }
+        .border-N { border-color: var(--color-n) !important; }
+        .text-UR { color: var(--color-ur); } .text-SSR { color: var(--color-ssr); } .text-SR { color: var(--color-sr); } .text-R { color: var(--color-r); } .text-N { color: var(--color-n); }
 
-        /* ==================== 📱 底部导航栏 ==================== */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 65px; background: #11131e; border-top: 1px solid #222638; display: flex; justify-content: space-around; align-items: center; z-index: 1000; box-shadow: 0 -5px 20px rgba(0,0,0,0.5); }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: #64748b; font-size: 11px; font-weight: bold; cursor: pointer; flex: 1; padding: 8px 0; gap: 4px; }
-        .nav-item.active { color: var(--primary); }
-        .nav-icon { font-size: 18px; }
-
-        /* 特效层 */
-        #fxCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 99998; pointer-events: none; display: none; }
-        #showcardOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 7, 12, 0.96); z-index: 99990; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
-        .giant-card { width: 85vw; max-width: 300px; height: 120vw; max-height: 420px; background: #191c2b; border-radius: 18px; padding: 15px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; border: 3px solid #3b4261; transform: scale(0.7); opacity: 0; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .giant-card.pop-up { transform: scale(1); opacity: 1; }
-        .giant-rarity { font-size: 28px; font-weight: 900; font-style: italic; align-self: flex-start; }
-        .giant-card img { width: 100%; height: 75%; object-fit: contain; border-radius: 10px; background: #0c0e17; padding: 4px; }
-        .giant-name { font-size: 18px; font-weight: bold; text-align: center; }
-        .next-btn { margin-top: 25px; padding: 12px 35px; font-size: 15px; background: #22c55e; color: white; border: none; border-radius: 25px; font-weight: bold; box-shadow: 0 4px 15px rgba(34,197,94,0.4); }
-        .empty-tip { color: #475569; text-align: center; font-style: italic; padding: 40px; width: 100%; }
+        /* 弹窗遮罩 */
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5,7,12,0.95); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; }
+        .giant-card { width: 260px; height: 380px; background: #1e2538; border: 3px solid #2d3748; border-radius: 16px; box-shadow: 0 0 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; padding: 15px; box-sizing: border-box; position: relative; }
+        .giant-card img { width: 100%; height: 70%; object-fit: contain; background: #121620; border-radius: 8px; }
+        .giant-info { margin-top: 15px; text-align: center; }
+        .giant-rarity { font-size: 18px; font-weight: 900; italic; margin-bottom: 5px; }
+        .giant-name { font-size: 16px; font-weight: bold; }
+        .overlay-actions { margin-top: 30px; width: 260px; }
+        .next-btn { width: 100%; padding: 12px 0; border: none; border-radius: 8px; background: #fff; color: #000; font-weight: bold; font-size: 15px; cursor: pointer; box-shadow: 0 4px 15px rgba(255,255,255,0.2); }
+        
+        /* 管理后台部分 */
+        .admin-panel { padding: 15px 20px 80px; }
+        .admin-section { background: #121620; border: 1px solid #1e2538; border-radius: 10px; padding: 15px; margin-bottom: 15px; }
+        .admin-section-title { font-size: 14px; font-weight: bold; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; color: #00dbde; }
+        .admin-row { display: flex; gap: 10px; margin-bottom: 10px; }
+        .form-group { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+        .form-group label { font-size: 12px; color: #94a3b8; }
+        .form-control { background: #1e2538; border: 1px solid #2d3748; border-radius: 6px; padding: 8px; color: #fff; font-size: 13px; }
+        .pack-selector { width: 100%; background: #1e2538; border: 1px solid #2d3748; border-radius: 6px; padding: 8px; color: #fff; margin-bottom: 10px; }
+        .admin-btn { width: 100%; padding: 10px 0; border: none; border-radius: 6px; font-size: 13px; font-weight: bold; color: #fff; cursor: pointer; margin-top: 5px; }
+        
+        /* 底部导航 */
+        .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; height: 60px; background: #121620; border-top: 1px solid #1e2538; display: flex; z-index: 100; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; color: #64748b; font-size: 11px; gap: 4px; cursor: pointer; }
+        .nav-item.active { color: #00dbde; }
+        .nav-item i { font-size: 18px; }
+        
+        /* 动画控制 */
+        .pop-up { animation: cardPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes cardPop { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
     </style>
 </head>
 <body>
 
-    <div class="header-bar">
-        <div class="header-top">
-            <div class="brand-title">POWER GO 4.7</div>
-            <div class="gold-badge">🪙 <span id="goldVal">5000</span></div>
-        </div>
-        <div class="search-container">
-            <i class="fa-solid fa-magnifying-glass search-icon"></i>
-            <input type="text" id="globalSearchInput" class="search-bar" placeholder="搜索商品、卡包、卡片名称..." oninput="triggerSearchFilter()">
-        </div>
-        <div class="category-scroll">
-            <div class="category-tag active" onclick="filterByIP('all', this)">全部IP</div>
-            <div class="category-tag" onclick="filterByIP('pokemon', this)">宝可梦</div>
-            <div class="category-tag" onclick="filterByIP('onepiece', this)">海贼王</div>
-            <div class="category-tag" onclick="filterByIP('naruto', this)">火影忍者</div>
-            <div class="category-tag" onclick="filterByIP('demonslayer', this)">鬼灭之刃</div>
+    <div class="header">
+        <div class="logo">POWER GO 4.7</div>
+        <div class="gold-badge">
+            <i class="fas fa-coins"></i> <span id="goldVal">5000</span>
         </div>
     </div>
 
-    <div id="view-home" class="view-section active">
-        <h2>🔥 热门推荐限定卡包</h2>
-        <div id="packGridContainer" class="pack-grid"></div>
-    </div>
-
-    <div id="view-bag" class="view-section">
-        <div class="warehouse-header">
-            <h2>🎒 我的核心个人仓库</h2>
-            <button class="clear-btn" onclick="sellAllWarehouse()">一键清空回收</button>
+    <div id="page-market" class="game-page">
+        <div class="tabs-bar" id="ipTabsContainer">
+            <div class="tab-btn active" onclick="switchIPFilter('all', this)">全部IP</div>
+            <div class="tab-btn" onclick="switchIPFilter('宝可梦', this)">宝可梦</div>
+            <div class="tab-btn" onclick="switchIPFilter('海贼王', this)">海贼王</div>
+            <div class="tab-btn" onclick="switchIPFilter('火影忍者', this)">火影忍者</div>
+            <div class="tab-btn" onclick="switchIPFilter('鬼灭之刃', this)">鬼灭之刃</div>
         </div>
-        <div id="warehouseGridContainer" class="warehouse-grid"></div>
+        <div class="section-title"><i class="fas fa-fire" style="color:#ff4500;"></i> 热门推荐限定卡包</div>
+        <div class="market-grid" id="marketGridContainer"></div>
     </div>
 
-    <div id="view-gm" class="view-section">
-        
-        <div id="adminLockWall" class="lock-container">
-            <div class="lock-title">🛑 核心业务配置管理层已锁定</div>
-            <div class="lock-tip">非运营管理人员切勿尝试非法试探渗透</div>
-            <div class="form-group">
-                <input type="password" id="adminPwdInput" class="form-control" style="text-align:center; letter-spacing:5px;" placeholder="请输入管理员秘钥">
+    <div id="page-warehouse" class="game-page" style="display: none;">
+        <div class="search-box">
+            <div class="search-inner">
+                <i class="fas fa-search"></i>
+                <input type="text" id="globalSearchInput" placeholder="搜索商品、卡包、卡片名称..." oninput="renderWarehouseView()">
             </div>
-            <button class="admin-btn" style="background:linear-gradient(135deg, #ef4444, #b91c1c);" onclick="verifyAdminPassword()">核验身份进入后台</button>
         </div>
+        <div class="admin-row" style="padding: 5px 20px 0;">
+            <button class="admin-btn" style="background:#ef4444; margin:0;" onclick="sellAllWarehouse()">🎒 一键全部回收清空</button>
+        </div>
+        <div class="warehouse-grid" id="warehouseGridContainer"></div>
+    </div>
 
-        <div id="adminRealView" class="admin-real-content">
-            <h2>🛠️ 核心运营可视化管理后台</h2>
-            <p style="color:#22c55e; font-size:12px; margin-bottom:15px; font-weight:bold;">🟢 管理员身份认证成功，数据热同步已就绪。</p>
-            
+    <div id="page-admin" class="game-page" style="display: none;">
+        <div class="admin-panel">
             <div class="admin-section">
-                <div class="admin-section-title">🪙 用户账户资金划拨</div>
-                <div class="form-group">
-                    <input type="number" id="gmGoldIn" class="form-control" style="color:var(--primary); font-weight:bold;">
-                </div>
-                <button class="admin-btn" onclick="saveGmGold()">即刻划拨资产</button>
-            </div>
-
-            <div class="admin-section">
-                <div class="admin-section-title">💰 全局卡片出售回收价格调配</div>
-                <p style="color:#64748b; font-size:11px; margin-bottom:10px;">在这里可以随意修改各级别卡片卖给系统时的回收价格（单位：🪙金币）</p>
+                <div class="admin-section-title">🪙 资方资产重置管理</div>
                 <div class="admin-row">
                     <div class="form-group">
-                        <label>N级回收价</label>
-                        <input type="number" id="priceN" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label>R级回收价</label>
-                        <input type="number" id="priceR" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label>SR级回收价</label>
-                        <input type="number" id="priceSR" class="form-control">
+                        <label>充值金币数量</label>
+                        <input type="number" id="gmGoldIn" class="form-control" value="5000">
                     </div>
                 </div>
-                <div class="admin-row">
-                    <div class="form-group">
-                        <label>SSR级回收价</label>
-                        <input type="number" id="priceSSR" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label>UR级回收价</label>
-                        <input type="number" id="priceUR" class="form-control">
-                    </div>
-                </div>
-                <button class="admin-btn" style="background:linear-gradient(135deg, #10b981, #059669);" onclick="saveRecoverPrices()">确认更新全国回收金卡价</button>
+                <button class="admin-btn" style="background:linear-gradient(135deg, #0575e6, #021b79);" onclick="saveGmGold()">确认修改资产</button>
             </div>
 
             <div class="admin-section">
                 <div class="admin-section-title">📊 全局抽卡爆率精密调配</div>
-                <p style="color:#64748b; font-size:11px; margin-bottom:10px;">请确保五项概率相加【严格等于 100%】，否则会导致抽卡数据错乱！</p>
+                <p style="color:#64748b; font-size:11px; margin-bottom:10px;">请确保五项概率相加【严格等于 100%】，否则会导致算法区间错乱！</p>
                 <div class="admin-row">
-                    <div class="form-group">
-                        <label>N 概率 (%)</label>
-                        <input type="number" id="rateN" class="form-control" step="0.1">
-                    </div>
-                    <div class="form-group">
-                        <label>R 概率 (%)</label>
-                        <input type="number" id="rateR" class="form-control" step="0.1">
-                    </div>
-                    <div class="form-group">
-                        <label>SR 概率 (%)</label>
-                        <input type="number" id="rateSR" class="form-control" step="0.1">
-                    </div>
+                    <div class="form-group"><label>N 概率 (%)</label><input type="number" id="rateN" class="form-control" step="0.1"></div>
+                    <div class="form-group"><label>R 概率 (%)</label><input type="number" id="rateR" class="form-control" step="0.1"></div>
+                    <div class="form-group"><label>SR 概率 (%)</label><input type="number" id="rateSR" class="form-control" step="0.1"></div>
                 </div>
                 <div class="admin-row">
-                    <div class="form-group">
-                        <label>SSR 概率 (%)</label>
-                        <input type="number" id="rateSSR" class="form-control" step="0.1">
-                    </div>
-                    <div class="form-group">
-                        <label>UR 概率 (%)</label>
-                        <input type="number" id="rateUR" class="form-control" step="0.1">
-                    </div>
+                    <div class="form-group"><label>SSR 概率 (%)</label><input type="number" id="rateSSR" class="form-control" step="0.1"></div>
+                    <div class="form-group"><label>UR 概率 (%)</label><input type="number" id="rateUR" class="form-control" step="0.1"></div>
                 </div>
-                <button class="admin-btn" style="background:linear-gradient(135deg, #3b82f6, #1d4ed8);" onclick="saveCustomRates()">确认更新全服爆率</button>
+                <button class="admin-btn" style="background:linear-gradient(135deg, #3b82f6, #1d4ed8);" onclick="saveCustomRates()">保存全局爆率配置</button>
             </div>
 
             <div class="admin-section">
-                <div class="admin-section-title">🖼️ 卡包封面与参数可视化配置</div>
-                <div class="form-group">
-                    <label>选择要修改的卡包系列</label>
-                    <select id="adminPackSelect" class="pack-selector" onchange="loadPackToAdminForm()"></select>
-                </div>
-                <div class="form-group">
+                <div class="admin-section-title">🗺️ 卡包封面与参数可视化配置</div>
+                <label style="font-size:12px; color:#94a3b8;">选择要修改的卡包系列</label>
+                <select id="adminPackSelect" class="pack-selector" onchange="loadPackToAdminForm()"></select>
+                <div class="form-group" style="margin-bottom:10px;">
                     <label>卡包名称</label>
                     <input type="text" id="adminPackTitle" class="form-control">
                 </div>
-                <div class="form-group">
-                    <label>卡包标签描述</label>
-                    <input type="text" id="adminPackTag" class="form-control">
-                </div>
-                <div class="form-group">
-                    <label>卡包封面图片链接 (替换此链接即可更换展示封面)</label>
+                <div class="form-group" style="margin-bottom:10px;">
+                    <label>卡包封面图片路径 (Banner URL)</label>
                     <input type="text" id="adminPackBanner" class="form-control">
                 </div>
-                <div class="form-group">
-                    <label>单抽价格 (🪙)</label>
+                <div class="form-group" style="margin-bottom:10px;">
+                    <label>单抽消耗金币</label>
                     <input type="number" id="adminPackCost" class="form-control">
                 </div>
-                <button class="admin-btn" onclick="savePackBasicConfig()">保存卡包基本配置</button>
-            </div>
-
-            <div class="admin-section">
-                <div class="admin-section-title">➕ 动态扩充卡包核心卡池内容</div>
-                <div class="form-group">
-                    <label>卡片名称</label>
-                    <input type="text" id="newCardName" class="form-control" placeholder="例如：路飞 五档 Gear5">
-                </div>
+                <button class="admin-btn" style="background:linear-gradient(135deg, #10b981, #059669);" onclick="savePackBasicConfig()">💾 保存此卡包基本参数</button>
+                
+                <hr style="border:0; border-top:1px solid #1e2538; margin:15px 0;">
+                <div style="font-size:12px; font-weight:bold; margin-bottom:8px; color:#ffd700;">✨ 当前卡包独立卡池预览/追填</div>
+                <div id="adminPoolPreview" style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; max-height:120px; overflow-y:auto; background:#161b26; padding:8px; border-radius:6px;"></div>
+                
                 <div class="admin-row">
+                    <div class="form-group"><label>新增单卡名称</label><input type="text" id="newCardName" class="form-control" placeholder="如：路飞五档"></div>
                     <div class="form-group">
-                        <label>稀有度级别</label>
+                        <label>稀有度</label>
                         <select id="newCardRarity" class="form-control">
-                            <option value="N">N</option>
-                            <option value="R">R</option>
-                            <option value="SR">SR</option>
-                            <option value="SSR">SSR</option>
-                            <option value="UR">UR</option>
+                            <option value="N">N</option><option value="R">R</option><option value="SR">SR</option><option value="SSR">SSR</option><option value="UR">UR</option>
                         </select>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label>卡片立绘静态图片网络链接</label>
-                    <input type="text" id="newCardImage" class="form-control" placeholder="https://example.com/card.png">
+                <div class="form-group" style="margin-bottom:10px;">
+                    <label>单卡图片路径</label>
+                    <input type="text" id="newCardImage" class="form-control" placeholder="留空则使用默认占位图">
                 </div>
-                <button class="admin-btn" style="background:linear-gradient(135deg, #a855f7, #7e22ce);" onclick="addNewCardToPool()">注入新角色卡进入卡池</button>
-
-                <label style="font-size: 12px; color: #94a3b8; display:block; margin-top:15px; margin-bottom:5px;">当前已有卡池内容预览</label>
-                <div id="adminPoolPreview" class="pool-preview-list"></div>
-            </div>
-
-            <div class="admin-section">
-                <div class="admin-section-title">🔑 修改后台管理员密码</div>
-                <div class="form-group">
-                    <label>新密码</label>
-                    <input type="text" id="newAdminPwd" class="form-control" placeholder="输入新的安全控制密码">
-                </div>
-                <button class="admin-btn" style="background:linear-gradient(135deg, #4b5563, #1f2937);" onclick="changeAdminPassword()">确认修改控制密码</button>
+                <button class="admin-btn" style="background:#7c3aed;" onclick="addNewCardToPool()">➕ 注入新单卡入池</button>
             </div>
         </div>
     </div>
 
-    <div id="detailOverlay">
-        <div class="detail-header">
-            <div class="back-btn" onclick="closePackDetail()"><i class="fa-solid fa-chevron-left"></i></div>
-            <h2 id="detailTitle">卡包详情</h2>
-        </div>
-        <div class="detail-content">
-            <img id="detailBanner" class="detail-banner-img" src="" alt="Pack Cover">
-            <div class="detail-intro">
-                欢迎来到该大IP盲盒系列池，本包严密遵循系统设定的原生粒子重力爆率。抽中后卡片将直接静默送入您的【仓库】中储存。
-            </div>
-            <div class="detail-actions">
-                <button class="action-big-btn btn-single" id="draw1Btn">
-                    <i class="fa-solid fa-cube"></i> 单次开启 (🪙 <span id="singleCost"></span>)
-                </button>
-                <button class="action-big-btn btn-ten" id="draw10Btn">
-                    <i class="fa-solid fa-cubes"></i> 尊享十连 (🪙 <span id="tenCost"></span>)
-                </button>
+    <div id="showcardOverlay" class="overlay">
+        <div id="giantCard" class="giant-card">
+            <img id="giantImg" src="" alt="卡片立绘">
+            <div class="giant-info">
+                <div id="giantRarity" class="giant-rarity">UR</div>
+                <div id="giantName" class="giant-name">测试卡片</div>
             </div>
         </div>
-    </div>
-
-    <div class="bottom-nav">
-        <div class="nav-item active" onclick="switchTab('home', this)">
-            <i class="fa-solid fa-bolt nav-icon"></i>
-            <div>潮玩</div>
-        </div>
-        <div class="nav-item" onclick="switchTab('bag', this)">
-            <i class="fa-solid fa-box-archive nav-icon"></i>
-            <div>仓库</div>
-        </div>
-        <div class="nav-item" onclick="switchTab('gm', this)">
-            <i class="fa-solid fa-sliders nav-icon"></i>
-            <div>高级后台</div>
+        <div class="overlay-actions">
+            <button id="nextCardBtn" class="next-btn" onclick="triggerNextQueuedCard()">下一张 (1/10)</button>
         </div>
     </div>
 
-    <canvas id="fxCanvas"></canvas>
-    <div id="showcardOverlay">
-        <div id="giantCard" class="giant-card"></div>
-        <button id="nextCardBtn" class="next-btn" onclick="triggerNextQueuedCard()">下一张 ➡️</button>
+    <canvas id="fxCanvas" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 999; display: none;"></canvas>
+
+    <div class="nav-bar">
+        <div class="nav-item active" onclick="switchPage('market', this)"><i class="fas fa-bolt"></i><span>潮玩</span></div>
+        <div class="nav-item" onclick="switchPage('warehouse', this)"><i class="fas fa-box"></i><span>仓库</span></div>
+        <div class="nav-item" onclick="switchPage('admin', this)"><i class="fas fa-sliders-h"></i><span>高级后台</span></div>
     </div>
 
-<script>
-    // ==================== 📦 原生底层默认内置配置数据矩阵 ====================
-    const DEFAULT_PACKS_CONFIG = [
-        {
-            id: "pack_pokemon",
-            ip: "pokemon",
-            title: "宝可梦：精灵觉醒系列",
-            tag: "🔥 经典大作 • 阿尔宙斯传说",
-            banner: "https://asia.pokemon-card.com/hk/card-img/hk00008119.png", 
-            cost: 100,
-            pool: [
-                { name: "妙蛙种子", rarity: "N", image: "https://asia.pokemon-card.com/tw/card-img/tw00013958.png" },
-                { name: "小火龙", rarity: "N", image: "https://asia.pokemon-card.com/tw/card-img/tw00014329.png" },
-                { name: "快龙 ex", rarity: "SR", image: "https://asia.pokemon-card.com/tw/card-img/tw00015998.png" },
-                { name: "皮卡丘 ex", rarity: "SSR", image: "https://asia.pokemon-card.com/tw/card-img/tw00011485.png" },
-                { name: "金色·阿尔宙斯 VSTAR", rarity: "UR", image: "https://p2.bahamut.com.tw/B/2KU/48/6bae19cfa9c1cb5ba1b9f5ea611tayo5.PNG" }
-            ]
-        },
-        {
-            id: "pack_onepiece",
-            ip: "onepiece",
-            title: "海贼王：航海王传奇战役",
-            tag: "⚓ 寻找大航海时代的终极宝藏",
-            banner: "https://www.onepiece-cardgame.com/images/products/boosters/op-05/mv.jpg",
-            cost: 120,
-            pool: [
-                { name: "乔巴", rarity: "N", image: "https://www.onepiece-cardgame.com/images/cardlist/card/OP01-006.png" },
-                { name: "娜美", rarity: "R", image: "https://www.onepiece-cardgame.com/images/cardlist/card/OP01-016.png" },
-                { name: "罗罗诺亚·索隆", rarity: "SR", image: "https://www.onepiece-cardgame.com/images/cardlist/card/OP01-025.png" },
-                { name: "蒙奇·D·路飞 (四档)", rarity: "SSR", image: "https://www.onepiece-cardgame.com/images/cardlist/card/OP01-024.png" },
-                { name: "路飞 · 太阳神五档形态", rarity: "UR", image: "https://www.onepiece-cardgame.com/images/products/boosters/op-05/cards/01.png" }
-            ]
-        },
-        {
-            id: "pack_naruto",
-            ip: "naruto",
-            title: "火影忍者：疾风传忍界大战",
-            tag: "🍃 继承火之意志的传奇忍道",
-            banner: "https://img.alicdn.com/imgextra/i4/2215320761222/O1CN015v8EaO1vUqO1uF0Zg_!!2215320761222.jpg",
-            cost: 150,
-            pool: [
-                { name: "春野樱", rarity: "N", image: "https://img.alicdn.com/imgextra/i4/2215320761222/O1CN01fXGZ8c1vUqNxmCg39_!!2215320761222.png" },
-                { name: "旗木卡卡西", rarity: "SR", image: "https://img.alicdn.com/imgextra/i4/2215320761222/O1CN01W2fLle1vUqO3P6sJ8_!!2215320761222.png" },
-                { name: "宇智波佐助 (千鸟)", rarity: "SSR", image: "https://img.alicdn.com/imgextra/i4/2215320761222/O1CN01A8A6uR1vUqO2p5r1U_!!2215320761222.png" },
-                { name: "漩涡鸣人 (九喇嘛模式)", rarity: "UR", image: "https://img.alicdn.com/imgextra/i3/2215320761222/O1CN01kOQhUe1vUqO2uXgRE_!!2215320761222.png" }
-            ]
-        },
-        {
-            id: "pack_demonslayer",
-            ip: "demonslayer",
-            title: "鬼灭之刃：无限列车与游郭篇",
-            tag: "⚔️ 斩断恶鬼的猎鬼人全集中",
-            banner: "https://img.alicdn.com/imgextra/i2/2207293504381/O1CN01n9Zf5G2Gfsh0K1WkI_!!2207293504381.jpg",
-            cost: 100,
-            pool: [
-                { name: "我妻善逸", rarity: "R", image: "https://img.alicdn.com/imgextra/i2/2207293504381/O1CN01FzN4G62Gfsh1qE6cR_!!2207293504381.png" },
-                { name: "嘴平伊之助", rarity: "R", image: "https://img.alicdn.com/imgextra/i1/2207293504381/O1CN01U9t9X52Gfsh3yK6H1_!!2207293504381.png" },
-                { name: "灶门祢豆子", rarity: "SR", image: "https://img.alicdn.com/imgextra/i4/2207293504381/O1CN01t2zTfO2Gfsh2eJ7fC_!!2207293504381.png" },
-                { name: "炼狱杏寿郎 (炎柱)", rarity: "SSR", image: "https://img.alicdn.com/imgextra/i3/2207293504381/O1CN01z7A8U62Gfsh2fO4dB_!!2207293504381.png" },
-                { name: "灶门炭治郎 (火之神神乐)", rarity: "UR", image: "https://img.alicdn.com/imgextra/i1/2207293504381/O1CN01e6A7U52Gfsh4bN7fC_!!2207293504381.png" }
-            ]
-        }
-    ];
+    <script>
+        // 1. 初始化标准商用卡包及基础卡池数据配置矩阵
+        const DEFAULT_PACKS_CONFIG = [
+            {
+                id: "pk_pokemon",
+                title: "宝可梦：世代传说珍藏弹",
+                tag: "宝可梦",
+                banner: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=500&q=80",
+                cost: 100,
+                pool: [
+                    { name: "极巨化喷火龙", rarity: "UR", image: "https://images.unsplash.com/photo-1613771404724-17c245a03452?w=300&q=80" },
+                    { name: "甲贺忍蛙", rarity: "SSR", image: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=300&q=80" },
+                    { name: "皮卡丘", rarity: "SR", image: "https://images.unsplash.com/photo-1615111784767-4d7c0269435b?w=300&q=80" },
+                    { name: "伊布", rarity: "R", image: "" },
+                    { name: "小火龙", rarity: "N", image: "" }
+                ]
+            },
+            {
+                id: "pk_onepiece",
+                title: "海贼王：新世界极意霸气弹",
+                tag: "海贼王",
+                banner: "https://images.unsplash.com/photo-1560169897-fc0cdbdfa4d5?w=500&q=80",
+                cost: 150,
+                pool: [
+                    { name: "路飞·五档太阳神", rarity: "UR", image: "" },
+                    { name: "索隆·阿修罗九刀流", rarity: "SSR", image: "" },
+                    { name: "香克斯", rarity: "SR", image: "" },
+                    { name: "艾斯", rarity: "R", image: "" },
+                    { name: "巴基", rarity: "N", image: "" }
+                ]
+            },
+            {
+                id: "pk_naruto",
+                title: "火影忍者：疾风传羁绊永恒弹",
+                tag: "火影忍者",
+                banner: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=500&q=80",
+                cost: 120,
+                pool: [
+                    { name: "宇智波斑·六道仙人", rarity: "UR", image: "" },
+                    { name: "漩涡鸣人·九喇嘛模式", rarity: "SSR", image: "" },
+                    { name: "宇智波佐助", rarity: "SR", image: "" },
+                    { name: "旗木卡卡西", rarity: "R", image: "" },
+                    { name: "漩涡博人", rarity: "N", image: "" }
+                ]
+            },
+            {
+                id: "pk_kimetsu",
+                title: "鬼灭之刃：无限城决战终章弹",
+                tag: "鬼灭之刃",
+                banner: "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=500&q=80",
+                cost: 100,
+                pool: [
+                    { name: "继国缘壹·日之呼吸", rarity: "UR", image: "" },
+                    { name: "灶门炭治郎·火之神神乐", rarity: "SSR", image: "" },
+                    { name: "炼狱杏寿郎", rarity: "SR", image: "" },
+                    { name: "嘴平伊之助", rarity: "R", image: "" },
+                    { name: "村田", rarity: "N", image: "" }
+                ]
+            }
+        ];
 
-    // 底层核心变量初始化
-    let PACKS_CONFIG = localStorage.getItem("pg_packs_4") !== null ? JSON.parse(localStorage.getItem("pg_packs_4")) : DEFAULT_PACKS_CONFIG;
-    let gold = localStorage.getItem("pg_gold_4") !== null ? parseInt(localStorage.getItem("pg_gold_4")) : 5000;
-    let warehouse = localStorage.getItem("pg_warehouse_4") !== null ? JSON.parse(localStorage.getItem("pg_warehouse_4")) : [];
-    
-    // 后台独立核心安全密钥锁
-    let adminPassword = localStorage.getItem("pg_admin_pwd") !== null ? localStorage.getItem("pg_admin_pwd") : "888888";
+        // 2. 动态加载持久化核心资产变量
+        let PACKS_CONFIG = JSON.parse(localStorage.getItem("pg_packs_4")) || DEFAULT_PACKS_CONFIG;
+        let gold = parseInt(localStorage.getItem("pg_gold_4")) || 5000;
+        let warehouse = JSON.parse(localStorage.getItem("pg_warehouse_4") || "[]");
 
-    // 💰 回收价格核心配置读取
-    const DEFAULT_RECOVER_PRICES = { "N": 10, "R": 50, "SR": 200, "SSR": 800, "UR": 3000 };
-    let recoverPrices = localStorage.getItem("pg_recover_prices") !== null ? JSON.parse(localStorage.getItem("pg_recover_prices")) : DEFAULT_RECOVER_PRICES;
+        // 3. 动态回收价格核心控制与爆率加载
+        const DEFAULT_RECOVER_PRICES = { "N": 10, "R": 50, "SR": 200, "SSR": 800, "UR": 3000 };
+        let recoverPrices = localStorage.getItem("pg_recover_prices") !== null ? JSON.parse(localStorage.getItem("pg_recover_prices")) : DEFAULT_RECOVER_PRICES;
 
-    // 📊 抽卡爆率核心配置读取
-    const DEFAULT_RATES = { "UR": 0.2, "SSR": 2.8, "SR": 5.0, "R": 12.0, "N": 80.0 };
-// 直接写死爆率，让它只听代码的话，彻底废掉导致 0.1 的坏缓存！
-let RATES = { "UR": 0.001, "SSR": 0.5, "SR": 2.499, "R": 12.0, "N": 85.0 };
-    let viewQueue = [];
-    let queueIdx = 0;
-    let selectedPackId = null;
-    let currentIPFilter = "all";
-    let audioCtx = null;
+        const DEFAULT_RATES = { "UR": 0.001, "SSR": 0.5, "SR": 2.499, "R": 12.0, "N": 85.0 };
+        let RATES = { "UR": 0.001, "SSR": 0.5, "SR": 2.499, "R": 12.0, "N": 85.0 };
 
-    window.onload = function() {
-        initCanvas();
-        updateGoldDisplay();
-        renderPacksMarket();
-        renderWarehouseView();
-        buildAdminPackSelector();
-        initAdminPricesForm(); // 装载回收价
-        initAdminRatesForm();  // 装载新添加的自定义爆率
-        document.getElementById("gmGoldIn").value = gold;
-    };
+        let viewQueue = [];
+        let queueIdx = 0;
+        let selectedPackId = null;
+        let currentIPFilter = "all";
+        let audioCtx = null;
 
-    function updateGoldDisplay() {
-        document.getElementById("goldVal").innerText = gold;
-        localStorage.setItem("pg_gold_4", gold);
-    }
-
-    function saveLocalStorageData() {
-        localStorage.setItem("pg_packs_4", JSON.stringify(PACKS_CONFIG));
-    }
-
-    // ==================== 💰 动态回收价格核心控制 ====================
-    function initAdminPricesForm() {
-        document.getElementById("priceN").value = recoverPrices["N"];
-        document.getElementById("priceR").value = recoverPrices["R"];
-        document.getElementById("priceSR").value = recoverPrices["SR"];
-        document.getElementById("priceSSR").value = recoverPrices["SSR"];
-        document.getElementById("priceUR").value = recoverPrices["UR"];
-    }
-
-    function saveRecoverPrices() {
-        recoverPrices["N"] = parseInt(document.getElementById("priceN").value) || 0;
-        recoverPrices["R"] = parseInt(document.getElementById("priceR").value) || 0;
-        recoverPrices["SR"] = parseInt(document.getElementById("priceSR").value) || 0;
-        recoverPrices["SSR"] = parseInt(document.getElementById("priceSSR").value) || 0;
-        recoverPrices["UR"] = parseInt(document.getElementById("priceUR").value) || 0;
-
-        localStorage.setItem("pg_recover_prices", JSON.stringify(recoverPrices));
-        renderWarehouseView(); 
-        alert("💰 全局卡片出售回收价格已重新洗牌！");
-    }
-
-    // ==================== 📊 动态爆率控制逻辑 ====================
-    function initAdminRatesForm() {
-        document.getElementById("rateN").value = RATES["N"];
-        document.getElementById("rateR").value = RATES["R"];
-        document.getElementById("rateSR").value = RATES["SR"];
-        document.getElementById("rateSSR").value = RATES["SSR"];
-        document.getElementById("rateUR").value = RATES["UR"];
-    }
-
-    function saveCustomRates() {
-        let n = parseFloat(document.getElementById("rateN").value) || 0;
-        let r = parseFloat(document.getElementById("rateR").value) || 0;
-        let sr = parseFloat(document.getElementById("rateSR").value) || 0;
-        let ssr = parseFloat(document.getElementById("rateSSR").value) || 0;
-        let ur = parseFloat(document.getElementById("rateUR").value) || 0;
-
-        // 严密校验相加是否等于 100
-        if (Math.abs((n + r + sr + ssr + ur) - 100) > 0.01) {
-            alert(`❌ 更新失败！当前填写的概率总和为 ${(n + r + sr + ssr + ur).toFixed(1)}%。五项概率相加必须严格等于 100%！`);
-            return;
-        }
-
-        RATES["N"] = n;
-        RATES["R"] = r;
-        RATES["SR"] = sr;
-        RATES["SSR"] = ssr;
-        RATES["UR"] = ur;
-
-        localStorage.setItem("pg_custom_rates", JSON.stringify(RATES));
-        alert("📊 全局抽卡重力爆率已重新洗牌！立即生效。");
-    }
-
-    // ==================== 🔑 后台密码核验安全锁逻辑 ====================
-    function verifyAdminPassword() {
-        const input = document.getElementById("adminPwdInput").value;
-        if(input === adminPassword) {
-            document.getElementById("adminLockWall").style.display = "none";
-            document.getElementById("adminRealView").style.display = "block";
-        } else {
-            alert("❌ 密码错误！高级后台已拒绝此次越权访问。");
-            document.getElementById("adminPwdInput").value = "";
-        }
-    }
-
-    function changeAdminPassword() {
-        const newPwd = document.getElementById("newAdminPwd").value.trim();
-        if(newPwd === "") {
-            alert("⚠️ 密码不能为空！");
-            return;
-        }
-        adminPassword = newPwd;
-        localStorage.setItem("pg_admin_pwd", adminPassword);
-        alert(`🔑 密码修改成功！新密码已生效。`);
-        document.getElementById("newAdminPwd").value = "";
-    }
-
-    // ==================== 📱 单页架构导航控制 ====================
-    function switchTab(targetId, el) {
-        document.querySelectorAll(".view-section").forEach(sec => sec.classList.remove("active"));
-        document.querySelectorAll(".nav-item").forEach(item => item.classList.remove("active"));
-        
-        document.getElementById("view-" + targetId).classList.add("active");
-        el.classList.add("active");
-
-        if(targetId === 'gm') {
-            document.getElementById("adminLockWall").style.display = "block";
-            document.getElementById("adminRealView").style.display = "none";
-            document.getElementById("adminPwdInput").value = "";
-        }
-    }
-
-    // ==================== 🏷️ 分区过滤与全局搜索 ====================
-    function filterByIP(ipKey, el) {
-        currentIPFilter = ipKey;
-        document.querySelectorAll(".category-tag").forEach(tag => tag.classList.remove("active"));
-        el.classList.add("active");
-        renderPacksMarket();
-    }
-
-    function triggerSearchFilter() {
-        renderPacksMarket();
-        renderWarehouseView();
-    }
-
-    function renderPacksMarket() {
-        const grid = document.getElementById("packGridContainer");
-        const keyword = document.getElementById("globalSearchInput").value.trim().toLowerCase();
-        grid.innerHTML = "";
-
-        let list = PACKS_CONFIG;
-        if (currentIPFilter !== "all") list = list.filter(p => p.ip === currentIPFilter);
-        if (keyword !== "") list = list.filter(p => p.title.toLowerCase().includes(keyword));
-
-        if(list.length === 0) {
-            grid.innerHTML = `<div class="empty-tip">该分区内没有匹配的卡包系列</div>`;
-            return;
-        }
-
-        list.forEach(pack => {
-            const card = document.createElement("div");
-            card.className = "pack-card";
-            card.innerHTML = `
-                <img class="pack-banner" src="${pack.banner}" onclick="openPackDetail('${pack.id}')">
-                <div class="pack-info">
-                    <div class="pack-name">${pack.title}</div>
-                    <div class="pack-tag">${pack.tag}</div>
-                </div>
-            `;
-            grid.appendChild(card);
-        });
-    }
-
-    // ==================== 🚪 二级页面控制 ====================
-    function openPackDetail(packId) {
-        selectedPackId = packId;
-        const pack = PACKS_CONFIG.find(p => p.id === packId);
-        if(!pack) return;
-
-        document.getElementById("detailTitle").innerText = pack.title;
-        document.getElementById("detailBanner").src = pack.banner;
-        document.getElementById("singleCost").innerText = pack.cost;
-        document.getElementById("tenCost").innerText = pack.cost * 10;
-
-        document.getElementById("draw1Btn").onclick = function() { executeDrawCore(1); };
-        document.getElementById("draw10Btn").onclick = function() { executeDrawCore(10); };
-
-        document.getElementById("detailOverlay").style.display = "flex";
-    }
-
-    function closePackDetail() {
-        document.getElementById("detailOverlay").style.display = "none";
-    }
-
-    // ==================== 🎲 抽卡核心算法 ====================
-    // ==================== 💎 100% 精准控率 & 零卡死安全抽卡核心全家桶 💎 ====================
-    function executeDrawCore(times) {
-        let currentPackCost = 100; 
-        let pack = null;
-        if (typeof PACKS_CONFIG !== 'undefined' && typeof selectedPackId !== 'undefined') {
-            pack = PACKS_CONFIG.find(p => p.id === selectedPackId);
-            if (pack) currentPackCost = pack.cost;
-        }
-
-        const singleCost = Number(document.getElementById("packCostInput")?.value) || currentPackCost;
-        const totalCost = singleCost * times;
-
-        if (gold < totalCost) {
-            alert("🪙 余额不足！请前去高级后台充值，或回收卡片。");
-            return;
-        }
-
-        gold -= totalCost;
-        updateGoldDisplay();
-
-        viewQueue = [];
-
-        let bUR = RATES["UR"];
-        let bSSR = bUR + RATES["SSR"];
-        let bSR = bSSR + RATES["SR"];
-        let bR = bSR + RATES["R"];
-
-        for (let i = 0; i < times; i++) {
-            let roll = Math.random() * 100;
-            let rarity = "N";
-
-            if (roll < bUR) rarity = "UR";
-            else if (roll < bSSR) rarity = "SSR";
-            else if (roll < bSR) rarity = "SR";
-            else if (roll < bR) rarity = "R";
-
-// ======= 🚀 精准替换区域：获取卡池并安全筛选 =======
-        // 1. 先通过选中的 ID，去全局配置里把卡包找出来
-        const currentPack = (typeof PACKS_CONFIG !== 'undefined' && typeof selectedPackId !== 'undefined') ? PACKS_CONFIG.find(p => p.id === selectedPackId) : null;
-        
-        // 2. 获取当前有效的总卡池
-        let pool = (typeof monsters !== 'undefined' && monsters.length > 0) ? monsters : ((currentPack && currentPack.pool) ? currentPack.pool : []);
-        
-        // 3. 筛选对应稀有度的卡
-        let filteredPool = pool.filter(m => m.rarity === rarity);
-        
-        // 4. 保底：如果这个稀有度没配卡，就用整个卡池兜底，防止抽空报错
-        if (filteredPool.length === 0) {
-            filteredPool = pool;
-        }
-
-        // 5. 抓取卡片并塞入仓库
-        let rolled = filteredPool[Math.floor(Math.random() * filteredPool.length)];
-        if (rolled) {
-            viewQueue.push(rolled);
-            warehouse.push({ ...rolled });
-        }
-            // 请看你文件的第 848 行大括号下面，有没有紧跟着这几行？
-        queueIdx = 0;
-        const overlay = document.getElementById("showcardOverlay");
-        if (overlay) {
-            overlay.style.display = "flex";
-            triggerNextQueuedCard();
-        }
-
-        localStorage.setItem("pg_warehouse_4", JSON.stringify(warehouse));
-        localStorage.setItem("pg_gold_4", gold);
-    } // <--- 这个大括号是整个 executeDrawCore 函数的结尾
-        // =================================================
-    // ==================== 🎬 二级卡牌展台切卡控制 ====================
-    function triggerNextQueuedCard() {
-        const giantCard = document.getElementById("giantCard");
-        const overlay = document.getElementById("showcardOverlay");
-        giantCard.classList.remove("pop-up");
-
-        if (queueIdx >= viewQueue.length) {
-            overlay.style.display = "none";
+        // 4. 游戏启动挂载钩子
+        window.onload = function() {
+            initCanvas();
+            updateGoldDisplay();
+            initAdminRatesForm();
+            renderPacksMarket();
             renderWarehouseView();
-            localStorage.setItem("pg_warehouse_4", JSON.stringify(warehouse));
-            return;
+            buildAdminPackSelector();
+            document.getElementById("gmGoldIn").value = gold;
+        };
+
+        function updateGoldDisplay() {
+            document.getElementById("goldVal").innerText = gold;
+            localStorage.setItem("pg_gold_4", gold);
         }
 
-        const currentCard = viewQueue[queueIdx];
-        const btn = document.getElementById("nextCardBtn");
-        btn.innerText = queueIdx === viewQueue.length - 1 ? "全部打包收入仓库 🎒" : `下一张 (${queueIdx + 1}/${viewQueue.length}) ➡️`;
+        function saveLocalPackData() {
+            localStorage.setItem("pg_packs_4", JSON.stringify(PACKS_CONFIG));
+        }
 
-        setTimeout(() => {
+        // 5. 多页面选项卡无缝路由机制切换
+        function switchPage(pageId, element) {
+            document.querySelectorAll(".game-page").forEach(p => p.style.display = "none");
+            document.getElementById("page-" + pageId).style.display = "block";
+            document.querySelectorAll(".nav-item").forEach(item => item.classList.remove("active"));
+            element.classList.add("active");
+            if (pageId === "market") renderPacksMarket();
+            if (pageId === "warehouse") renderWarehouseView();
+            if (pageId === "admin") buildAdminPackSelector();
+        }
+
+        function switchIPFilter(tag, element) {
+            currentIPFilter = tag;
+            document.querySelectorAll("#ipTabsContainer .tab-btn").forEach(btn => btn.classList.remove("active"));
+            element.classList.add("active");
+            renderPacksMarket();
+        }
+
+        // 6. 潮玩市场渲染器
+        function renderPacksMarket() {
+            const container = document.getElementById("marketGridContainer");
+            container.innerHTML = "";
+            const filtered = currentIPFilter === "all" ? PACKS_CONFIG : PACKS_CONFIG.filter(p => p.tag === currentIPFilter);
+            
+            filtered.forEach(pack => {
+                const card = document.createElement("div");
+                card.className = "pack-card";
+                card.innerHTML = `
+                    <img class="pack-banner" src="${pack.banner}" onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=500&q=80'">
+                    <div class="pack-info">
+                        <div class="pack-title">${pack.title}</div>
+                        <div class="pack-cost"><i class="fas fa-coins"></i>${pack.cost} / 单抽</div>
+                    </div>
+                    <div class="pack-actions">
+                        <button class="draw-btn" onclick="executeDrawCore('${pack.id}', 1)">单次开启</button>
+                        <button class="draw-btn btn-10" onclick="executeDrawCore('${pack.id}', 10)">尊享十连</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // ==================== 💎 核心高可靠纯计算抽卡算法 ====================
+        function executeDrawCore(packId, times) {
+            selectedPackId = packId;
+            const pack = PACKS_CONFIG.find(p => p.id === selectedPackId);
+            if (!pack) {
+                alert("❌ 系统缺陷：当前未选定有效的抽卡系列！");
+                return;
+            }
+
+            let totalCost = pack.cost * times;
+            if (gold < totalCost) {
+                alert("⚠️ 您当前的资本余额不足以进行本次开启！");
+                return;
+            }
+
+            gold -= totalCost;
+            updateGoldDisplay();
+            viewQueue = [];
+
+            // 爆率区间递增组合累加
+            let bUR = RATES["UR"];
+            let bSSR = bUR + RATES["SSR"];
+            let bSR = bSSR + RATES["SR"];
+            let bR = bSR + RATES["R"];
+
+            for (let i = 0; i < times; i++) {
+                let roll = Math.random() * 100;
+                let rarity = "N";
+
+                if (roll < bUR) rarity = "UR";
+                else if (roll < bSSR) rarity = "SSR";
+                else if (roll < bSR) rarity = "SR";
+                else if (roll < bR) rarity = "R";
+
+                // 高安全卡池获取
+                const currentPack = (typeof PACKS_CONFIG !== 'undefined' && typeof selectedPackId !== 'undefined') ? PACKS_CONFIG.find(p => p.id === selectedPackId) : null;
+                let pool = (currentPack && currentPack.pool) ? currentPack.pool : [];
+                let filteredPool = pool.filter(m => m.rarity === rarity);
+                
+                if (filteredPool.length === 0) {
+                    filteredPool = pool;
+                }
+
+                let rolled = filteredPool[Math.floor(Math.random() * filteredPool.length)];
+                if (!rolled) {
+                    rolled = { name: "基础纪念章", rarity: "N", image: "" };
+                }
+
+                viewQueue.push(rolled);
+                warehouse.push({ ...rolled, timestamp: Date.now() + i });
+            }
+
+            queueIdx = 0;
+            const overlay = document.getElementById("showcardOverlay");
+            if (overlay) {
+                overlay.style.display = "flex";
+                triggerNextQueuedCard();
+            }
+
+            localStorage.setItem("pg_warehouse_4", JSON.stringify(warehouse));
+        }
+
+        // 7. 二级卡牌展台切卡控制引擎与立绘显示
+        function triggerNextQueuedCard() {
+            const giantCard = document.getElementById("giantCard");
+            const overlay = document.getElementById("showcardOverlay");
+            giantCard.classList.remove("pop-up");
+
+            if (queueIdx >= viewQueue.length) {
+                overlay.style.display = "none";
+                renderWarehouseView();
+                return;
+            }
+
+            const currentCard = viewQueue[queueIdx];
+            const btn = document.getElementById("nextCardBtn");
+            btn.innerText = queueIdx === viewQueue.length - 1 ? "全部打包入仓库 💼" : `下一张 (${queueIdx + 1}/${viewQueue.length})`;
+
+            // 渲染数据
+            document.getElementById("giantRarity").className = `giant-rarity text-${currentCard.rarity}`;
+            document.getElementById("giantRarity").innerText = currentCard.rarity;
+            document.getElementById("giantName").innerText = currentCard.name;
+            
+            const gImg = document.getElementById("giantImg");
+            if (currentCard.image) {
+                gImg.src = currentCard.image;
+                gImg.style.display = "block";
+            } else {
+                gImg.src = "";
+                gImg.style.display = "none";
+            }
+
+            // 特效及色彩设置
             giantCard.className = `giant-card border-${currentCard.rarity}`;
             let colorHex = "#fff";
-            if(currentCard.rarity === 'UR') colorHex = "var(--color-ur)";
-            else if(currentCard.rarity === 'SSR') colorHex = "var(--color-ssr)";
-            else if(currentCard.rarity === 'SR') colorHex = "var(--color-sr)";
+            if (currentCard.rarity === "UR") colorHex = "var(--color-ur)";
+            else if (currentCard.rarity === "SSR") colorHex = "var(--color-ssr)";
+            else if (currentCard.rarity === "SR") colorHex = "var(--color-sr)";
+            else if (currentCard.rarity === "R") colorHex = "var(--color-r)";
 
-            giantCard.innerHTML = `
-                <div class="giant-rarity" style="color:${colorHex}">${currentCard.rarity}</div>
-                <img src="${currentCard.image}">
-                <div class="giant-name">${currentCard.name}</div>
-            `;
-            giantCard.classList.add("pop-up");
-            queueIdx++;
-            igniteFXSystem(currentCard.rarity);
-        }, 120);
-    }
-
-    // ==================== 🎒 个人大仓库 ====================
-    function renderWarehouseView() {
-        const container = document.getElementById("warehouseGridContainer");
-        const keyword = document.getElementById("globalSearchInput").value.trim().toLowerCase();
-        
-        let displayList = warehouse;
-        if(keyword !== "") displayList = warehouse.filter(item => item.name.toLowerCase().includes(keyword));
-
-        if (displayList.length === 0) {
-            container.innerHTML = `<div class="empty-tip">仓库内目前空空如也</div>`;
-            return;
-        }
-        
-        container.innerHTML = "";
-        displayList.forEach((m, idx) => {
-            let dynamicPrice = recoverPrices[m.rarity] !== undefined ? recoverPrices[m.rarity] : 10;
-            const node = document.createElement("div");
-            node.className = `bag-item border-${m.rarity}`;
-            node.innerHTML = `
-                <img class="bag-item-img" src="${m.image}">
-                <div class="bag-item-name">${m.name}</div>
-                <div class="bag-item-rarity" style="color:var(--color-${m.rarity.toLowerCase()})">${m.rarity}</div>
-                <button class="cell-action-btn" onclick="recycleOneItem(${idx})">回收 +${dynamicPrice}</button>
-            `;
-            container.appendChild(node);
-        });
-    }
-
-    function recycleOneItem(index) {
-        let cardRarity = warehouse[index].rarity;
-        let dynamicPrice = recoverPrices[cardRarity] !== undefined ? recoverPrices[cardRarity] : 10;
-        
-        gold += dynamicPrice;
-        warehouse.splice(index, 1);
-        updateGoldDisplay();
-        renderWarehouseView();
-        localStorage.setItem("pg_warehouse_4", JSON.stringify(warehouse));
-    }
-
-    function sellAllWarehouse() {
-        if (warehouse.length === 0) return;
-        let total = 0;
-        warehouse.forEach(item => {
-            let dynamicPrice = recoverPrices[item.rarity] !== undefined ? recoverPrices[item.rarity] : 10;
-            total += dynamicPrice;
-        });
-        gold += total;
-        warehouse = [];
-        updateGoldDisplay();
-        renderWarehouseView();
-        localStorage.setItem("pg_warehouse_4", JSON.stringify(warehouse));
-        alert(`💰 仓库清理成功，按最新金价回笼资产 ${total} 金币！`);
-    }
-
-    // ==================== 🛠️ 可视化管理后台系统 ====================
-    function buildAdminPackSelector() {
-        const sel = document.getElementById("adminPackSelect");
-        sel.innerHTML = "";
-        PACKS_CONFIG.forEach(p => {
-            const opt = document.createElement("option");
-            opt.value = p.id;
-            opt.innerText = p.title;
-            sel.appendChild(opt);
-        });
-        loadPackToAdminForm();
-    }
-
-    function loadPackToAdminForm() {
-        const packId = document.getElementById("adminPackSelect").value;
-        const pack = PACKS_CONFIG.find(p => p.id === packId);
-        if(!pack) return;
-
-        document.getElementById("adminPackTitle").value = pack.title;
-        document.getElementById("adminPackTag").value = pack.tag;
-        document.getElementById("adminPackBanner").value = pack.banner;
-        document.getElementById("adminPackCost").value = pack.cost;
-
-        refreshAdminPoolPreview(pack);
-    }
-
-    function savePackBasicConfig() {
-        const packId = document.getElementById("adminPackSelect").value;
-        const pack = PACKS_CONFIG.find(p => p.id === packId);
-        if(!pack) return;
-
-        pack.title = document.getElementById("adminPackTitle").value.trim();
-        pack.tag = document.getElementById("adminPackTag").value.trim();
-        pack.banner = document.getElementById("adminPackBanner").value.trim();
-        pack.cost = parseInt(document.getElementById("adminPackCost").value) || 100;
-
-        saveLocalStorageData();
-        renderPacksMarket(); 
-        buildAdminPackSelector(); 
-        document.getElementById("adminPackSelect").value = packId;
-        alert("✨ 该卡包配置/封面已热更新完成，即时生效！");
-    }
-
-    function refreshAdminPoolPreview(pack) {
-        const container = document.getElementById("adminPoolPreview");
-        container.innerHTML = "";
-        pack.pool.forEach(c => {
-            const div = document.createElement("div");
-            div.className = "pool-preview-item";
-            div.innerHTML = `<span>${c.name}</span><span style="color:var(--color-${c.rarity.toLowerCase()})">${c.rarity}</span>`;
-            container.appendChild(div);
-        });
-    }
-
-    function addNewCardToPool() {
-        const packId = document.getElementById("adminPackSelect").value;
-        const pack = PACKS_CONFIG.find(p => p.id === packId);
-        if(!pack) return;
-
-        const name = document.getElementById("newCardName").value.trim();
-        const rarity = document.getElementById("newCardRarity").value;
-        const image = document.getElementById("newCardImage").value.trim();
-
-        if(!name || !image) {
-            alert("⚠️ 请完整填写卡片名称和图片链接路径！");
-            return;
+            setTimeout(() => {
+                giantCard.classList.add("pop-up");
+                igniteFXSystem(currentCard.rarity);
+                playSoundAudio(currentCard.rarity);
+                queueIdx++;
+            }, 20);
         }
 
-        pack.pool.push({ name: name, rarity: rarity, image: image });
-        saveLocalStorageData();
-        refreshAdminPoolPreview(pack);
+        // 8. 仓库独立网格动态渲染与精准独立单体回收
+        function renderWarehouseView() {
+            const container = document.getElementById("warehouseGridContainer");
+            if (!container) return;
+            container.innerHTML = "";
 
-        document.getElementById("newCardName").value = "";
-        document.getElementById("newCardImage").value = "";
-        alert(`🎉 成功将新卡【${name}】注入到随机抽奖池中！`);
-    }
+            const keyword = document.getElementById("globalSearchInput") ? document.getElementById("globalSearchInput").value.trim().toLowerCase() : "";
+            let displayList = warehouse;
+            if (keyword !== "") {
+                displayList = warehouse.filter(item => item.name.toLowerCase().includes(keyword) || item.rarity.toLowerCase().includes(keyword));
+            }
 
-    function saveGmGold() {
-        gold = parseInt(document.getElementById("gmGoldIn").value) || 0;
-        updateGoldDisplay();
-        alert("🎯 资产充值修改成功！");
-    }
+            if (displayList.length === 0) {
+                container.innerHTML = `<div class="empty-tips">仓库内目前空空如也</div>`;
+                return;
+            }
 
-    // ==================== 🔊 Web Audio 音效引擎 ====================
-    function playSynthAudio(type) {
-        try {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const now = audioCtx.currentTime;
+            displayList.forEach((item, index) => {
+                const price = recoverPrices[item.rarity] !== undefined ? recoverPrices[item.rarity] : 10;
+                const node = document.createElement("div");
+                node.className = `bag-item border-${item.rarity}`;
+                
+                const imgSrc = item.image ? item.image : "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150&q=80";
+                node.innerHTML = `
+                    <img src="${imgSrc}">
+                    <div class="bag-name">${item.name}</div>
+                    <div class="bag-rarity text-${item.rarity}">${item.rarity}</div>
+                    <div class="bag-price"><i class="fas fa-coins"></i>+${price}</div>
+                    <button class="recycle-btn" onclick="recycleOneItem(${index})">一键回收</button>
+                `;
+                container.appendChild(node);
+            });
+        }
+
+        function recycleOneItem(index) {
+            const cardRarity = warehouse[index].rarity;
+            const price = recoverPrices[cardRarity] !== undefined ? recoverPrices[cardRarity] : 10;
+            gold += price;
+            warehouse.splice(index, 1);
+            updateGoldDisplay();
+            renderWarehouseView();
+            localStorage.setItem("pg_warehouse_4", JSON.stringify(warehouse));
+        }
+
+        function sellAllWarehouse() {
+            if (warehouse.length === 0) return;
+            let total = 0;
+            warehouse.forEach(item => {
+                const price = recoverPrices[item.rarity] !== undefined ? recoverPrices[item.rarity] : 10;
+                total += price;
+            });
+            gold += total;
+            warehouse = [];
+            updateGoldDisplay();
+            renderWarehouseView();
+            localStorage.setItem("pg_warehouse_4", JSON.stringify(warehouse));
+            alert(`💰 仓库清理成功，按最新折价回笼资产 \$${total} 金币！`);
+        }
+
+        // ==================== 🛠️ 可视化管理后台系统 ====================
+        function initAdminRatesForm() {
+            document.getElementById("rateN").value = RATES["N"];
+            document.getElementById("rateR").value = RATES["R"];
+            document.getElementById("rateSR").value = RATES["SR"];
+            document.getElementById("rateSSR").value = RATES["SSR"];
+            document.getElementById("rateUR").value = RATES["UR"];
+        }
+
+        function saveCustomRates() {
+            let n = Number(document.getElementById("rateN").value);
+            let r = Number(document.getElementById("rateR").value);
+            let sr = Number(document.getElementById("rateSR").value);
+            let ssr = Number(document.getElementById("rateSSR").value);
+            let ur = Number(document.getElementById("rateUR").value);
+
+            if (Math.abs((n + r + sr + ssr + ur) - 100) > 0.01) {
+                alert("❌ 保存失败：五项配置合计不等于100%，请修正！");
+                return;
+            }
+
+            RATES["N"] = n; RATES["R"] = r; RATES["SR"] = sr; RATES["SSR"] = ssr; RATES["UR"] = ur;
+            alert("🎯 该卡包配置/时间已热更新完成，即时生效！");
+        }
+
+        function saveGmGold() {
+            const val = parseInt(document.getElementById("gmGoldIn").value);
+            if (!isNaN(val)) {
+                gold = val;
+                updateGoldDisplay();
+                alert("🪙 资产充值修改成功！");
+            }
+        }
+
+        function buildAdminPackSelector() {
+            const select = document.getElementById("adminPackSelect");
+            select.innerHTML = "";
+            PACKS_CONFIG.forEach(p => {
+                const opt = document.createElement("option");
+                opt.value = p.id;
+                opt.innerText = p.title;
+                select.appendChild(opt);
+            });
+            loadPackToAdminForm();
+        }
+
+        function loadPackToAdminForm() {
+            const packId = document.getElementById("adminPackSelect").value;
+            const pack = PACKS_CONFIG.find(p => p.id === packId);
+            if (!pack) return;
+
+            document.getElementById("adminPackTitle").value = pack.title;
+            document.getElementById("adminPackBanner").value = pack.banner;
+            document.getElementById("adminPackCost").value = pack.cost;
+            refreshAdminPoolPreview(pack);
+        }
+
+        function refreshAdminPoolPreview(pack) {
+            const container = document.getElementById("adminPoolPreview");
+            container.innerHTML = "";
+            pack.pool.forEach(c => {
+                const div = document.createElement("div");
+                div.style.padding = "4px 8px";
+                div.style.background = "#2d3748";
+                div.style.borderRadius = "4px";
+                div.style.fontSize = "11px";
+                div.innerHTML = `${c.name} <span class="text-${c.rarity}">[${c.rarity}]</span>`;
+                container.appendChild(div);
+            });
+        }
+
+        function savePackBasicConfig() {
+            const packId = document.getElementById("adminPackSelect").value;
+            const pack = PACKS_CONFIG.find(p => p.id === packId);
+            if (!pack) return;
+
+            pack.title = document.getElementById("adminPackTitle").value.trim();
+            pack.banner = document.getElementById("adminPackBanner").value.trim();
+            pack.cost = parseInt(document.getElementById("adminPackCost").value) || 100;
             
-            if (type === 'N' || type === 'R') {
-                let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain();
-                osc.type = 'sine'; osc.frequency.setValueAtTime(587.33, now); 
-                osc.frequency.exponentialRampToValueAtTime(880, now + 0.1);
-                gain.gain.setValueAtTime(0.08, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
-                osc.connect(gain); gain.connect(audioCtx.destination);
-                osc.start(now); osc.stop(now + 0.12);
-            } else if (type === 'SR') {
-                triggerChord([440, 554.37, 659.25], 0.35, 'triangle');
-            } else if (type === 'SSR') {
-                triggerChord([523.25, 659.25, 783.99, 1046.50], 0.6, 'sawtooth');
-            } else if (type === 'UR') {
-                triggerChord([220, 329.63, 392, 440, 554.37], 0.7, 'sawtooth');
-            }
-        } catch (e) { console.log(e); }
-    }
-
-    function triggerChord(freqs, duration, waveType) {
-        const now = audioCtx.currentTime;
-        freqs.forEach(f => {
-            let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain();
-            osc.type = waveType; osc.frequency.setValueAtTime(f, now);
-            gain.gain.setValueAtTime(0.05, now); gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.start(now); osc.stop(now + duration);
-        });
-    }
-
-    // ==================== 🛠️ Canvas 喷射粒子特效 ====================
-    let canvas, ctx, particles = [], fxAnimationId;
-    function initCanvas() { canvas = document.getElementById("fxCanvas"); ctx = canvas.getContext("2d"); window.addEventListener("resize", resizeCanvas); resizeCanvas(); }
-    function resizeCanvas() { if(canvas) { canvas.width = window.innerWidth; canvas.height = window.innerHeight; } }
-
-    function igniteFXSystem(rarity) {
-        cancelAnimationFrame(fxAnimationId); particles = [];
-        playSynthAudio(rarity);
-
-        if (rarity === "N" || rarity === "R") { document.getElementById("fxCanvas").style.display = "none"; return; }
-        document.getElementById("fxCanvas").style.display = "block";
-        
-        let colors = rarity === "SR" ? ["#c084fc", "#a855f7", "#ffffff"] : (rarity === "SSR" ? ["#fbbf24", "#f59e0b", "#ffffff"] : ["#ef4444", "#dc2626", "#ffd700"]);
-        const spawnX = window.innerWidth / 2; const spawnY = window.innerHeight * 0.45;
-        let pCount = rarity === "UR" ? 140 : 70;
-
-        for(let i=0; i<pCount; i++) {
-            let angle = Math.random() * Math.PI * 2; let speed = Math.random() * 7 + 4;
-            particles.push({ x: spawnX, y: spawnY, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed - 1.5, radius: Math.random() * 4 + 2, color: colors[Math.floor(Math.random() * colors.length)], alpha: 1, decay: Math.random() * 0.02 + 0.015 });
+            saveLocalPackData();
+            alert("✨ 卡包基本参数修改完成！");
         }
-        runFXLoop();
-    }
 
-    function runFXLoop() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height); let active = false;
-        particles.forEach(p => {
-            p.x += p.vx; p.y += p.vy; p.vy += 0.12; p.alpha -= p.decay;
-            if(p.alpha > 0) {
-                active = true; ctx.save(); ctx.globalAlpha = p.alpha; ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2); ctx.fillStyle = p.color; ctx.fill(); ctx.restore();
+        function addNewCardToPool() {
+            const packId = document.getElementById("adminPackSelect").value;
+            const pack = PACKS_CONFIG.find(p => p.id === packId);
+            if (!pack) return;
+
+            const name = document.getElementById("newCardName").value.trim();
+            const rarity = document.getElementById("newCardRarity").value;
+            const image = document.getElementById("newCardImage").value.trim();
+
+            if (!name) {
+                alert("⚠️ 请完整填写卡片名称及图片路径！");
+                return;
             }
-        });
-        if(active) fxAnimationId = requestAnimationFrame(runFXLoop);
-        else document.getElementById("fxCanvas").style.display = "none";
-    }
-</script>
+
+            pack.pool.push({ name, rarity, image });
+            saveLocalPackData();
+            refreshAdminPoolPreview(pack);
+            
+            document.getElementById("newCardName").value = "";
+            document.getElementById("newCardImage").value = "";
+            alert(`🎉 成功将新卡【${name}】注入到随机抽奖池中！`);
+        }
+
+        // ==================== 🔊 Web Audio 音效系统引擎 ====================
+        function playSoundAudio(rarity) {
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === "suspended") {
+                    audioCtx.resume();
+                }
+                const now = audioCtx.currentTime;
+                if (rarity === 'N' || rarity === 'R') {
+                    let osc = audioCtx.createOscillator();
+                    let gain = audioCtx.createGain();
+                    osc.type = 'sine'; osc.frequency.setValueAtTime(587.33, now);
+                    gain.gain.exponentialRampToValueAtTime(0.08, now); gain.gain.linearRampToValueAtTime(0.001, now + 0.12);
+                    osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now); osc.stop(now + 0.12);
+                } else if (rarity === 'SR') {
+                    triggerChord([440.00, 554.37, 659.25], 0.3, 'triangle');
+                } else if (rarity === 'SSR') {
+                    triggerChord([523.25, 659.25, 783.99, 1046.50], 0.6, 'sawtooth');
+                } else if (rarity === 'UR') {
+                    triggerChord([220.30, 329.63, 392.40, 440.00, 554.37], 1.0, 'sawtooth');
+                }
+            } catch (e) { console.log(e); }
+        }
+
+        function triggerChord(freqs, duration, waveType) {
+            const now = audioCtx.currentTime;
+            freqs.forEach(f => {
+                let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain();
+                osc.type = waveType; osc.frequency.setValueAtTime(f, now);
+                gain.gain.setValueAtTime(0.05, now); gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+                osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now); osc.stop(now + duration);
+            });
+        }
+
+        // ==================== 🎆 Canvas 喷射粒子特效引擎 ====================
+        let canvas, ctx, particles = [], fxAnimationId;
+        function initCanvas() {
+            canvas = document.getElementById("fxCanvas");
+            ctx = canvas.getContext("2d");
+            window.addEventListener("resize", resizeCanvas);
+            resizeCanvas();
+        }
+        function resizeCanvas() {
+            if(canvas) { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        }
+        function igniteFXSystem(rarity) {
+            cancelAnimationFrame(fxAnimationId);
+            particles = [];
+            if (rarity === "N" || rarity === "R") {
+                document.getElementById("fxCanvas").style.display = "none";
+                return;
+            }
+            document.getElementById("fxCanvas").style.display = "block";
+            let colors = rarity === "SSR" ? ["#ffd700", "#ff8c00", "#ffffff"] : ["#ff4444", "#dc2626", "#ffd700"];
+            if (rarity === "SR") colors = ["#a020f0", "#a855f7", "#ffffff"];
+            
+            let count = rarity === "UR" ? 140 : 70;
+            const startX = window.innerWidth / 2;
+            const startY = window.innerHeight * 0.45;
+            
+            for (let i = 0; i < count; i++) {
+                let p = (rarity === "UR") ? 7 : 4;
+                particles.push({
+                    x: startX, y: startY,
+                    vx: (Math.random() - 0.5) * p, vy: (Math.random() - 0.6) * p - 2,
+                    alpha: 1, decay: Math.random() * 0.015 + 0.01,
+                    size: Math.random() * 4 + 2, color: colors[Math.floor(Math.random() * colors.length)]
+                });
+            }
+            runFXLoop();
+        }
+        function runFXLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let active = false;
+            particles.forEach(p => {
+                if (p.alpha > 0) {
+                    active = true; p.x += p.vx; p.y += p.vy; p.vy += 0.12; p.alpha -= p.decay;
+                    ctx.save(); ctx.globalAlpha = p.alpha; ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fillStyle = p.color; ctx.fill(); ctx.restore();
+                }
+            });
+            if (active) fxAnimationId = requestAnimationFrame(runFXLoop);
+            else document.getElementById("fxCanvas").style.display = "none";
+        }
+    </script>
 </body>
 </html>
