@@ -831,15 +831,25 @@ function executeDrawCore(times) {
 // (接上面 for 循环结束后的逻辑)
     // } // <--- for 循环在 829 行结束
 
-    // 4. 统一处理展示与保存
+// 4. 统一处理展示与保存
     queueIdx = 0;
-    document.getElementById("showcardOverlay").style.display = "flex";
+    
+    // 查找弹窗容器
+    const overlay = document.getElementById("showcardOverlay");
+    
+    if (overlay) {
+        overlay.style.display = "flex"; // 强行显示弹窗
+        console.log("界面展示已触发");
+    } else {
+        console.error("错误：找不到 ID 为 'showcardOverlay' 的弹窗容器，请检查 HTML！");
+    }
+
     triggerNextQueuedCard();
 
     if (typeof inventory !== 'undefined') {
         localStorage.setItem("pg_inventory", JSON.stringify(inventory));
     }
-} // <--- 函数在这里闭合，不再有重复代码
+} // 确保这里有一个大括号闭合函数
     // ==================== 🎬 二级卡牌展台切卡控制 ====================
     function triggerNextQueuedCard() {
         const giantCard = document.getElementById("giantCard");
