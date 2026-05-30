@@ -791,65 +791,78 @@
     // ==================== 🎲 抽卡核心算法 ====================
     // ==================== 💎 100% 精准控率 & 零卡死安全抽卡核心全家桶 💎 ====================
 // 确保函数是唯一入口，且所有逻辑都在花括号内
-function executeDrawCore(times) {
-    // 1. 获取消耗费用
-    const singleCost = Number(document.getElementById("packCostInput")?.value) || 100;
-    const totalCost = singleCost * times;
-    
-    // 扣费
-    gold -= totalCost;
-    updateGoldDisplay();
-
-    viewQueue = [];
-
-    // 2. 概率计算
-    let bUR = Number(RATES["UR"]);
-    let bSSR = bUR + Number(RATES["SSR"]);
-    let bSR = bSSR + Number(RATES["SR"]);
-    let bR = bSR + Number(RATES["R"]);
-
-    // 3. 抽卡循环
-    for (let i = 0; i < times; i++) {
-        let roll = Math.random() * 100;
-        let rarity = "N"; 
-
-        if (roll < bUR) rarity = "UR";
-        else if (roll < bSSR) rarity = "SSR";
-        else if (roll < bSR) rarity = "SR";
-        else if (roll < bR) rarity = "R";
-
-     // 修改第 821 行，使用更安全的取值逻辑
-let pool = (typeof monsters !== 'undefined' && monsters.length > 0) ? monsters : ((typeof pack !== 'undefined' && pack && pack.pool) ? pack.pool : []);
-        let filteredPool = pool.filter(m => m.rarity === rarity);
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🌟 Power Go Premium 4.7 爆率+回收双控商用版 🌟</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* ... 此处保留你原有的全部 CSS 样式代码，直接复制你原本的即可 ... */
+    </style>
+</head>
+<body>
+    <script>
+        // ... (保留你原有的所有 DEFAULT_PACKS_CONFIG 数据矩阵) ...
         
-        if (filteredPool.length === 0) filteredPool = pool;
+        // 核心抽卡逻辑（修复了 pack 定义丢失和概率判定问题）
+        function executeDrawCore(times) {
+            const pack = PACKS_CONFIG.find(p => p.id === selectedPackId);
+            if (!pack) {
+                alert("❌ 系统错误：未找到对应的卡包配置！");
+                return;
+            }
 
-        let rolled = filteredPool[Math.floor(Math.random() * filteredPool.length)];
-        viewQueue.push(rolled);
-        if (typeof inventory !== 'undefined') inventory.push({ ...rolled });
-    }
+            const totalCost = pack.cost * times;
+            if (gold < totalCost) {
+                alert("⚠️ 金币不足，请联系管理员充值！");
+                return;
+            }
+            
+            gold -= totalCost;
+            updateGoldDisplay();
 
-// (接上面 for 循环结束后的 }，即第 829 行)
-    
-    // 4. 统一处理展示与保存
-    queueIdx = 0;
-    
-    // 确保弹窗元素存在并显示
-    const overlay = document.getElementById("showcardOverlay");
-    if (overlay) {
-        overlay.style.display = "flex";
-    }
-    
-    // 触发动画逻辑
-    if (typeof triggerNextQueuedCard === 'function') {
-        triggerNextQueuedCard();
-    }
-    
-    // 保存库存
-    if (typeof inventory !== 'undefined') {
-        localStorage.setItem("pg_inventory", JSON.stringify(inventory));
-    }
-} // <--- 这是函数的闭合大括号，请确保它存在
+            viewQueue = [];
+            // 确保使用最新的爆率配置
+            let bUR = Number(RATES["UR"]);
+            let bSSR = bUR + Number(RATES["SSR"]);
+            let bSR = bSSR + Number(RATES["SR"]);
+            let bR = bSR + Number(RATES["R"]);
+
+            for (let i = 0; i < times; i++) {
+                let roll = Math.random() * 100;
+                let rarity = "N"; 
+
+                if (roll < bUR) rarity = "UR";
+                else if (roll < bSSR) rarity = "SSR";
+                else if (roll < bSR) rarity = "SR";
+                else if (roll < bR) rarity = "R";
+
+                let pool = pack.pool;
+                let filteredPool = pool.filter(m => m.rarity === rarity);
+                if (filteredPool.length === 0) filteredPool = pool;
+
+                let rolled = filteredPool[Math.floor(Math.random() * filteredPool.length)];
+                viewQueue.push(rolled);
+                warehouse.push({ ...rolled });
+            }
+
+            queueIdx = 0;
+            const overlay = document.getElementById("showcardOverlay");
+            if (overlay) {
+                overlay.style.display = "flex";
+                triggerNextQueuedCard();
+            }
+            
+            localStorage.setItem("pg_warehouse_4", JSON.stringify(warehouse));
+            localStorage.setItem("pg_gold_4", gold);
+        }
+
+        // ... (此处保留你原有的其余所有 JS 功能函数，确保代码完整性) ...
+    </script>
+</body>
+</html>
     // ==================== 🎬 二级卡牌展台切卡控制 ====================
     function triggerNextQueuedCard() {
         const giantCard = document.getElementById("giantCard");
