@@ -606,8 +606,8 @@
 
     // 📊 抽卡爆率核心配置读取
     const DEFAULT_RATES = { "UR": 0.2, "SSR": 2.8, "SR": 5.0, "R": 12.0, "N": 80.0 };
-    let RATES = localStorage.getItem("pg_custom_rates") !== null ? JSON.parse(localStorage.getItem("pg_custom_rates")) : DEFAULT_RATES;
-
+// 直接写死爆率，让它只听代码的话，彻底废掉导致 0.1 的坏缓存！
+let RATES = { "UR": 0.001, "SSR": 0.5, "SR": 2.499, "R": 12.0, "N": 85.0 };
     let viewQueue = [];
     let queueIdx = 0;
     let selectedPackId = null;
@@ -825,54 +825,39 @@
             else if (roll < bSR) rarity = "SR";
             else if (roll < bR) rarity = "R";
 
-            let filteredPool = [];
-            if (typeof monsters !== 'undefined' && monsters.length > 0) {
-                filteredPool = monsters.filter(m => m.rarity === rarity);
-            } else if (pack && pack.pool) {
-                filteredPool = pack.pool.filter(m => m.rarity === rarity);
-            }
+// ======= 🚀 精准替换区域：获取卡池并安全筛选 =======
+        // 1. 先通过选中的 ID，去全局配置里把卡包找出来
+        const currentPack = (typeof PACKS_CONFIG !== 'undefined' && typeof selectedPackId !== 'undefined') ? PACKS_CONFIG.find(p => p.id === selectedPackId) : null;
+        
+        // 2. 获取当前有效的总卡池
+        let pool = (typeof monsters !== 'undefined' && monsters.length > 0) ? monsters : ((currentPack && currentPack.pool) ? currentPack.pool : []);
+        
+        // 3. 筛选对应稀有度的卡
+        let filteredPool = pool.filter(m => m.rarity === rarity);
+        
+        // 4. 保底：如果这个稀有度没配卡，就用整个卡池兜底，防止抽空报错
+        if (filteredPool.length === 0) {
+            filteredPool = pool;
+        }
 
-            if (filteredPool.length === 0) {
-                const fallbacks = ["SSR", "SR", "R", "N"];
-                for (let f of fallbacks) {
-                    if (typeof monsters !== 'undefined') {
-                        filteredPool = monsters.filter(m => m.rarity === f);
-                    }
-                    if (filteredPool.length === 0 && pack && pack.pool) {
-                        filteredPool = pack.pool.filter(m => m.rarity === f);
-                    }
-                    if (filteredPool.length > 0) break;
-                }
-            }
-
-            if (filteredPool.length === 0) {
-                filteredPool = (typeof monsters !== 'undefined' && monsters.length > 0) ? monsters : (pack ? pack.pool : []);
-            }
-
-            if (!filteredPool || filteredPool.length === 0) {
-                alert("❌ 错误：未在系统内找到有效的卡池配置，请检查当前卡包内是否有卡牌定义！");
-                return;
-            }
-
-            let rolled = filteredPool[Math.floor(Math.random() * filteredPool.length)];
+        // 5. 抓取卡片并塞入仓库
+        let rolled = filteredPool[Math.floor(Math.random() * filteredPool.length)];
+        if (rolled) {
             viewQueue.push(rolled);
-            
-            if (typeof inventory !== 'undefined') inventory.push({ ...rolled });
-            if (typeof warehouse !== 'undefined') warehouse.push({ ...rolled });
+            warehouse.push({ ...rolled });
         }
-
+            // 请看你文件的第 848 行大括号下面，有没有紧跟着这几行？
         queueIdx = 0;
-        document.getElementById("showcardOverlay").style.display = "flex";
-        triggerNextQueuedCard();
-
-        if (typeof inventory !== 'undefined') {
-            localStorage.setItem("pg_inventory", JSON.stringify(inventory));
+        const overlay = document.getElementById("showcardOverlay");
+        if (overlay) {
+            overlay.style.display = "flex";
+            triggerNextQueuedCard();
         }
-        if (typeof warehouse !== 'undefined') {
-            localStorage.setItem("pg_warehouse_4", JSON.stringify(warehouse));
-        }
-    }
 
+        localStorage.setItem("pg_warehouse_4", JSON.stringify(warehouse));
+        localStorage.setItem("pg_gold_4", gold);
+    } // <--- 这个大括号是整个 executeDrawCore 函数的结尾
+        // =================================================
     // ==================== 🎬 二级卡牌展台切卡控制 ====================
     function triggerNextQueuedCard() {
         const giantCard = document.getElementById("giantCard");
